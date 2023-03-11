@@ -1,0 +1,60 @@
+{
+  "name": "youtube-view-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JijaProGamer/Youtube-View-Bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JijaProGamer/Youtube-View-Bot/issues"
+  },
+  "homepage": "https://github.com/JijaProGamer/Youtube-View-Bot#readme",
+  "devDependencies": {
+    "@bulatdashiev/svelte-slider": "^1.0.3",
+    "@sveltejs/kit": "^1.0.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "prettier": "^2.8.0",
+    "prettier-plugin-svelte": "^2.8.1",
+    "svelte": "^3.54.0",
+    "svelte-check": "^3.0.1",
+    "typescript": "^4.9.3",
+    "vite": "^4.0.0"
+  },
+  "dependencies": {
+    "@sveltejs/adapter-node": "^1.1.4",
+    "@sveltejs/adapter-static": "^1.0.5",
+    "await-to-js": "^3.0.0",
+    "axios": "^1.2.3",
+    "better-sqlite3": "^8.0.1",
+    "better-sqlite3-session-store": "^0.1.0",
+    "better-ytdl-core": "^1.0.1",
+    "express": "^4.18.2",
+    "express-bearer-token": "^2.4.0",
+    "express-session": "^1.17.3",
+    "fast-proxy-tester": "^1.0.2",
+    "find-chrome-bin": "^1.0.2",
+    "helmet": "^6.0.1",
+    "puppeteer": "^19.6.0",
+    "sass": "^1.57.1",
+    "socket.io": "^4.5.4",
+    "socket.io-client": "^4.5.4",
+    "svelte-chartjs": "^3.1.2",
+    "svelte-multiselect": "^8.3.0",
+    "svelte-preprocess": "^5.0.1",
+    "systeminformation": "^5.17.4",
+    "typescript": "^4.9.5",
+    "uuid": "^9.0.0",
+    "vm2": "^3.9.14",
+    "youtube-selfbot-api": "^3.2.9"
+  }
+}

@@ -1,0 +1,27 @@
+
+body {
+    background-color: #383838;
+    background-image: url("/images/boxed-bg-dark.png");
+}
+
+body, html, main {
+    max-height: 100%;
+}
+
+button, a {
+    text-decoration: none;
+    color: #e0e3e6;
+    background-color: #353c42;
+    border: 1px solid #3d444b;
+    font-size: 14px;
+    font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+
+button:disabled {
+    background-color: rgb(36, 35, 35);
+    color: #858080;
+}
+
+h1 {
+    font-size: 2em;
+}
