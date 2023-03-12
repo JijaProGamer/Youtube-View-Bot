@@ -20,7 +20,7 @@
 
 		cpu_load = health.load.currentLoad.toFixed(1);
 		memory_usage = ((health.memory.active / health.memory.total) * 100).toFixed(1);
-		temp = health.temperature.main?.toFixed(1) || "0";
+		temp = health.temperature.main?.toFixed(1) || '0';
 
 		if (parseInt(cpu_load) < 45) {
 			cpu_color = 'green';
@@ -223,7 +223,7 @@
 						<span class="sidebar_btn_title">Change password</span>
 					</a>
 
-					<a class="sidebar_button blue_sidebar" href="https://www.patreon.com/Bloxxy213/membership">
+					<a class="sidebar_button blue_sidebar" href="/donate">
 						<img src="/svgs/donate.svg" alt="button svg" class="sidebar_image" />
 						<span class="sidebar_btn_title">Donate</span>
 					</a>
