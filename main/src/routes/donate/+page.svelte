@@ -1,26 +1,3 @@
-<script lang="ts">
-	import axios from 'axios';
-
-	/*let password = '';
-	$: disabled = password.length <= 0;
-
-	axios.get("/api/health").then(() => {
-		window.location.href = "/"
-	})
-	.catch(() => {})
-
-	function publishPassword() {
-		axios
-			.post('/api/login', { password })
-			.then((res) => {
-				window.location.href = '/';
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	}*/
-</script>
-
 <div id="local_container">
 	<div id="form_container">
 		<h1 id="app_title">Donation methods</h1>
@@ -61,9 +38,12 @@
 	}
 
 	#donation_methods {
-		position: relative;
-		margin-top: 50%;
-		transform: translateY(-100%);
+		display: flex;
+		
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		flex-direction: column;
 	}
 
 	.donation {

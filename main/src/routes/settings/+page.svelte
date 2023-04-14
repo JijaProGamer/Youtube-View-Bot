@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Slider from '@bulatdashiev/svelte-slider';
 	import { opts, dataChanged, newData } from '../../background.js';
 	let data = opts;
 	dataChanged((newData: any) => (data = newData));
@@ -6,7 +7,7 @@
 
 	$: changePort(data.server_port);
 
-	function changePort(newPort: Number) {
+	function changePort(newPort: number) {
 		if (newPort < 1024) {
 			data.server_port = 1024;
 		}
@@ -148,6 +149,28 @@
 
 				<p class="setting_info">Should the workers automatically skip all ads?</p>
 			</div>
+
+			{#if !data.auto_skip_ads}
+				<div class="setting_div">
+					<div class="same_line">
+						<h2 class="setting_name">Skip ads after (percent):</h2>
+
+						<Slider max="100" min="15" bind:value={data.skip_ads_after} range order />
+					</div>
+
+					<p class="setting_info">After what percent to skip ads?</p>
+				</div>
+
+				<div class="setting_div">
+					<div class="same_line">
+						<h2 class="setting_name">Skip ads after (max seconds):</h2>
+
+						<input class="setting_text" type="number" bind:value={data.max_seconds_ads} />
+					</div>
+
+					<p class="setting_info">After how many seconds to forcefully skip?</p>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

@@ -8,6 +8,8 @@ let socket = io("/", {
 });
 
 let opts: Options = {
+    skip_ads_after: [5, 85],
+    max_seconds_ads: 60,
     chromePath: "",
     close_server_on_finish: false,
     no_visuals: false,

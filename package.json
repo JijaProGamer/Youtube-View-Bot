@@ -55,6 +55,6 @@
     "typescript": "^4.9.5",
     "uuid": "^9.0.0",
     "vm2": "^3.9.14",
-    "youtube-selfbot-api": "^3.2.9"
+    "youtube-selfbot-api": "^3.3.6"
   }
 }

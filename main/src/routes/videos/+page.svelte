@@ -46,7 +46,7 @@
 		if (!videoInfo[video.id]) return ['any'];
 
 		let result_arr = ['any'];
-		let difference = (new Date() - new Date(videoInfo[video.id].uploadDate)) / 86400000;
+		let difference = (new Date().getTime() - new Date(videoInfo[video.id].uploadDate).getTime()) / 86400000;
 		if (difference < 7) result_arr.unshift('this week');
 		if (difference < 30) result_arr.unshift('this month');
 		if (difference < 365) result_arr.unshift('this year');
