@@ -40,7 +40,6 @@ function checkProxies(proxies) {
                             io.emit("newProxiesStats", proxyStats)
 
                             if (finished == needed) {
-                                console.log(1)
                                 resolved = true
                                 resolve()
                             }
@@ -58,7 +57,6 @@ function checkProxies(proxies) {
                             }
 
                             if (finished == needed) {
-                                console.log(1)
                                 resolved = true
                                 resolve()
                             }
@@ -70,7 +68,6 @@ function checkProxies(proxies) {
                         io.emit("newProxiesStats", proxyStats)
 
                         if (finished == needed) {
-                            console.log(1)
                             resolved = true
                             resolve()
                         }

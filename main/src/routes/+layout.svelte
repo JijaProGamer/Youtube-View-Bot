@@ -101,14 +101,31 @@
 			});
 	}
 
+	let el = document.querySelector('#slot');
+	let scrollpos_str = localStorage.getItem(`scrollpos-${window.location.href.split("://")[1]}`);
+	let scrollpos = scrollpos_str ? parseInt(scrollpos_str) : 0;
+	el?.scrollTo(0, scrollpos);
+
+	window.onbeforeunload = function () {
+		if(el) localStorage.setItem(`scrollpos-${window.location.href.split("://")[1]}`, el.scrollTop.toString());
+	};
+
 	let actualNavbar = window.innerHeight < window.innerWidth;
 
 	let VRS = 'V?.?.?';
+	let latestVRS = 'V?.?.?';
 
 	axios
 		.get('/api/version')
 		.then((data) => {
 			VRS = data.data;
+		})
+		.catch(() => {});
+
+	axios
+		.get('/api/latest_version')
+		.then((data) => {
+			latestVRS = data.data;
 		})
 		.catch(() => {});
 
@@ -144,6 +161,8 @@
 		}
 	}
 </script>
+
+<div id="warning" />
 
 <div id="main_div">
 	{#if showNavbar}
@@ -237,7 +256,9 @@
 				<button id="start_workers" class="worker_{workersStatus}" on:click={start_workers}>
 					{workersTitle}
 				</button>
-				<p id="version_container">version {VRS}</p>
+				<p id="version_container" class={latestVRS == VRS ? 'latest_version' : 'old_version'}>
+					version {VRS}
+				</p>
 			</div>
 
 			<div id="slot" class="slot-color">
@@ -252,6 +273,14 @@
 </div>
 
 <style lang="scss">
+	.latest_version {
+		color: rgb(45, 223, 22);
+	}
+
+	.old_version {
+		color: rgb(216, 20, 6);
+	}
+
 	#start_workers {
 		color: rgb(240, 234, 227);
 
@@ -290,7 +319,6 @@
 
 		margin-right: 3%;
 
-		color: rgb(240, 234, 227);
 		font-weight: bold;
 		font-size: 1.75em;
 	}

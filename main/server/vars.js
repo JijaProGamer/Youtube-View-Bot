@@ -3,8 +3,10 @@ export let neededRanks = {
 
     health: 1, 
     workingStatus: 1, 
+    latest_version: 1, 
     version: 1, 
     proxiesStats: 1,
+    video_details: 1,
     view_stats: 1,
     video_info: 1,
     view_workers_stats: 1,

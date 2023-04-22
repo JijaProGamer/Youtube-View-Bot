@@ -44,6 +44,7 @@
     "fast-proxy-tester": "^1.0.2",
     "find-chrome-bin": "^1.0.2",
     "helmet": "^6.0.1",
+    "papaparse": "^5.4.1",
     "puppeteer": "^19.6.0",
     "sass": "^1.57.1",
     "socket.io": "^4.5.4",
@@ -55,6 +56,7 @@
     "typescript": "^4.9.5",
     "uuid": "^9.0.0",
     "vm2": "^3.9.14",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz",
     "youtube-selfbot-api": "^3.3.6"
   }
 }

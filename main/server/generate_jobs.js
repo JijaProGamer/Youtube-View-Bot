@@ -3,6 +3,25 @@ let selfbot_api = new youtubeSelfbotApi()
 
 let accountOnlyTypes = ["suggestions", "subscribers"]
 
+function clamp(num, min, max) {
+    return num <= min ? min : num >= max ? max : num
+}
+
+function calculateAction(work_video){
+    let likePercent = clamp(work_video.likePercent, 0, 100)
+    let dislikePercent = clamp(work_video.likePercent, 0, 100)
+    let percent1 = Math.random() * 100
+    let percent2 = Math.random() * 100
+
+    if(percent1 < likePercent){
+        return "like"
+    }
+
+    if(percent2 < dislikePercent){
+        return "dislike"
+    }
+}
+
 function generateJob(work_video, work_proxies, video_id, videoInfo, work_account) {
     let available_watch_types = work_video.available_watch_types
     if(!work_account){
@@ -36,11 +55,24 @@ function generateJob(work_video, work_proxies, video_id, videoInfo, work_account
     job.id = video_id
 
     if (work_account) {
+        let action = calculateAction(work_video)
+        let comment
+        if(work_video.comments.length > 0){
+            let comment_index = random(0, work_video.comments.length)
+            comment = work_video.comments[comment_index]
+
+            work_video.comments.splice(comment_index, 1);
+        }
+
+        console.log(comment)
+
         job.account = {
             ...work_account,
-            likeAt: random(work_account.likeAt[0], work_account.likeAt[1]),
-            dislikeAt: random(work_account.dislikeAt[0], work_account.dislikeAt[1]),
-            commentAt: random(work_account.commentAt[0], work_account.commentAt[1]),
+            like: action == "like",
+            dislike: action == "dislike",
+            likeAt: random(work_video.likeAt[0], work_video.likeAt[1]),
+            dislikeAt: random(work_video.dislikeAt[0], work_video.dislikeAt[1]),
+            commentAt: random(work_video.commentAt[0], work_video.commentAt[1]),
         }
     }
 

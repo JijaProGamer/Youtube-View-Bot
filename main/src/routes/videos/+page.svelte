@@ -46,7 +46,8 @@
 		if (!videoInfo[video.id]) return ['any'];
 
 		let result_arr = ['any'];
-		let difference = (new Date().getTime() - new Date(videoInfo[video.id].uploadDate).getTime()) / 86400000;
+		let difference =
+			(new Date().getTime() - new Date(videoInfo[video.id].uploadDate).getTime()) / 86400000;
 		if (difference < 7) result_arr.unshift('this week');
 		if (difference < 30) result_arr.unshift('this month');
 		if (difference < 365) result_arr.unshift('this year');
@@ -57,27 +58,27 @@
 	let availableSortBy = ['relevance', 'upload date', 'view count', 'rating'];
 
 	function generateDuration(video: any) {
-		if (!videoInfo[video.id]) return ['any']
-		if (videoInfo[video.id].videoType == 'livestream') return ['any']
+		if (!videoInfo[video.id]) return ['any'];
+		if (videoInfo[video.id].videoType == 'livestream') return ['any'];
 
 		let duration = videoInfo[video.id].duration;
-		if (duration < 240) return ['under 4 minutes', 'any']
-		if (duration > 1200) return ['over 20 minutes', 'any']
-		return ['4-20 minutes', 'any']
+		if (duration < 240) return ['under 4 minutes', 'any'];
+		if (duration > 1200) return ['over 20 minutes', 'any'];
+		return ['4-20 minutes', 'any'];
 	}
 
 	function generateFeatures(video: any) {
 		if (!videoInfo[video.id]) return [];
 		let result_arr = [];
 
-		if (videoInfo[video.id].videoType == 'livestream') result_arr.unshift("live")
+		if (videoInfo[video.id].videoType == 'livestream') result_arr.unshift('live');
 
-		if (videoInfo[video.id].validFilters.is4K) result_arr.unshift('4k')
-		if (videoInfo[video.id].validFilters.isHD) result_arr.unshift('hd')
-		if (videoInfo[video.id].validFilters.is3D) result_arr.unshift('3d')
-		if (videoInfo[video.id].validFilters.isHDR) result_arr.unshift('hdr')
+		if (videoInfo[video.id].validFilters.is4K) result_arr.unshift('4k');
+		if (videoInfo[video.id].validFilters.isHD) result_arr.unshift('hd');
+		if (videoInfo[video.id].validFilters.is3D) result_arr.unshift('3d');
+		if (videoInfo[video.id].validFilters.isHDR) result_arr.unshift('hdr');
 
-		return result_arr
+		return result_arr;
 	}
 
 	let videoInfo: any = {};
@@ -110,7 +111,6 @@
 				livestream_watchtime: 300,
 				watch_entire_livestream: true,
 				guest_views: 10,
-				accounts: [],
 				available_watch_types: ['search', 'direct'],
 				keywords: [],
 				filters: {
@@ -118,7 +118,16 @@
 					duration: 'any',
 					sort_by: 'relevance',
 					features: []
-				}
+				},
+
+				accounts: [],
+				comments: [],
+
+				likePercent: 50,
+				dislikePercent: 100,
+				likeAt: [25, 75],
+				dislikeAt: [25, 75],
+				commentAt: [25, 75]
 			});
 
 			videos = videos;
@@ -325,37 +334,76 @@
 								<div class="same_line">
 									<h2 class="setting_name">Features:</h2>
 
-									<MultiSelect
-										bind:selected={video.features}
-										options={generateFeatures(video)}
-									/>
+									<MultiSelect bind:selected={video.features} options={generateFeatures(video)} />
 								</div>
 							</div>
 						{/if}
 
 						<h1 class="setting_discloser">Account list</h1>
-						<button
-							class="new_button_account"
-							on:click={() => {
-								video.accounts.unshift({
-									like: false,
-									dislike: false,
-									likeAt: [25, 75],
-									dislikeAt: [25, 75],
-									comment: '',
-									commentAt: [25, 75],
-									email: '',
-									password: '',
-									cookies: ''
-								});
 
-								video = video;
-							}}>Add account</button
-						>
+						<div class="import_line">
+							<button
+								class="new_button_account"
+								on:click={() => {
+									video.accounts.unshift({
+										email: '',
+										password: '',
+										cookies: ''
+									});
+
+									video = video;
+								}}>Add account</button
+							>
+
+							<input
+								id="hidden_account_input-{index}"
+								type="file"
+								accept=".txt,.xlsx,.csv"
+								on:change={(e) => {
+									let file = e.target.files[0];
+									let reader = new FileReader();
+									reader.onload = function (e) {
+										let data = e.target.result;
+
+										socket.emit('accounts_import', {
+											data: data,
+											fileType: file.type,
+											video: video
+										});
+										setTimeout(() => {
+											document.location.reload();
+										}, 250);
+									};
+
+									reader.readAsArrayBuffer(file);
+								}}
+								hidden
+							/>
+
+							<button
+								class="new_button_account"
+								on:click={() => {
+									let hidden_input = document.querySelector(`#hidden_account_input-${index}`);
+									hidden_input?.click();
+								}}>Import accounts</button
+							>
+
+							<button
+								class="new_button_account"
+								on:click={() => {
+									const a = document.createElement('a');
+									const url = `/api/video_details?type=accounts&video=${video.id}`;
+									a.href = url;
+									document.body.appendChild(a);
+									a.click();
+									document.body.removeChild(a);
+								}}>Extract accounts</button
+							>
+						</div>
 
 						<div class="accounts_container">
 							{#each video.accounts as account, acc_index}
-								<div class="video_container account_container container_gray">
+								<div class="account_container container_gray">
 									<button
 										class="video_id"
 										on:click={() => {
@@ -423,100 +471,160 @@
 											</p>
 										{/if}
 									</div>
-
-									<div class="setting_div">
-										<div class="same_line">
-											<h2 class="setting_name">Like:</h2>
-
-											<input
-												class="setting_button setting_checkbox"
-												type="checkbox"
-												bind:checked={account.like}
-											/>
-										</div>
-
-										{#if acc_index == 0}
-											<p class="setting_info">Should the bot like the video?</p>
-										{/if}
-									</div>
-
-									{#if account.like && videoInfo[video.id].videoType !== 'livestream'}
-										<div class="setting_div">
-											<div class="same_line">
-												<h2 class="setting_name">Like at:</h2>
-
-												<Slider max="100" bind:value={video.likeAt} range order />
-											</div>
-
-											{#if acc_index == 0}
-												<p class="setting_info">When should the bot like the video?</p>
-											{/if}
-										</div>
-									{/if}
-
-									<div class="setting_div">
-										<div class="same_line">
-											<h2 class="setting_name">Dislike:</h2>
-
-											<input
-												class="setting_button setting_checkbox"
-												type="checkbox"
-												bind:checked={account.dislike}
-											/>
-										</div>
-
-										{#if acc_index == 0}
-											<p class="setting_info">Should the bot dislike the video?</p>
-										{/if}
-									</div>
-
-									{#if account.dislike && videoInfo[video.id].videoType !== 'livestream'}
-										<div class="setting_div">
-											<div class="same_line">
-												<h2 class="setting_name">Dislike at moment:</h2>
-
-												<Slider max="100" bind:value={video.dislikeAt} range order />
-											</div>
-
-											{#if acc_index == 0}
-												<p class="setting_info">When should the bot dislike the video?</p>
-											{/if}
-										</div>
-									{/if}
-
-									<div class="setting_div">
-										<div class="same_line">
-											<h2 class="setting_name">Comment (Optional):</h2>
-
-											<input
-												class="setting_text"
-												placeholder="comment"
-												type="text"
-												bind:value={account.comment}
-											/>
-										</div>
-
-										{#if acc_index == 0}
-											<p class="setting_info">What should the bot comment? (Optional)</p>
-										{/if}
-									</div>
-
-									{#if account.comment && videoInfo[video.id].videoType !== 'livestream'}
-										<div class="setting_div">
-											<div class="same_line">
-												<h2 class="setting_name">Comment at moment:</h2>
-
-												<Slider max="100" bind:value={video.commentAt} range order />
-											</div>
-
-											{#if acc_index == 0}
-												<p class="setting_info">When should the bot comment?</p>
-											{/if}
-										</div>
-									{/if}
 								</div>
 							{/each}
 						</div>
+
+						{#if video.accounts.length > 0}
+							<div class="setting_div">
+								<div class="same_line">
+									<h2 class="setting_name">Like at:</h2>
+
+									<Slider max="100" bind:value={video.likeAt} range order />
+								</div>
+
+								{#if index == 0}
+									<p class="setting_info">When should each account like?</p>
+								{/if}
+							</div>
+
+							<div class="setting_div">
+								<div class="same_line">
+									<h2 class="setting_name">Dislike at:</h2>
+
+									<Slider max="100" bind:value={video.dislikeAt} range order />
+								</div>
+
+								{#if index == 0}
+									<p class="setting_info">When should each account dislike?</p>
+								{/if}
+							</div>
+
+							<div class="setting_div">
+								<div class="same_line">
+									<h2 class="setting_name">Comment at:</h2>
+
+									<Slider max="100" bind:value={video.commentAt} range order />
+								</div>
+
+								{#if index == 0}
+									<p class="setting_info">When should each account comment?</p>
+								{/if}
+							</div>
+
+							<div class="setting_div">
+								<div class="same_line">
+									<h2 class="setting_name">Like percent:</h2>
+
+									<input
+										class="setting_text"
+										type="number"
+										min="0"
+										max="100"
+										bind:value={video.likePercent}
+									/>
+								</div>
+
+								{#if index == 0}
+									<p class="setting_info">What is the chance of the bot liking the video?</p>
+								{/if}
+							</div>
+
+							<div class="setting_div">
+								<div class="same_line">
+									<h2 class="setting_name">Dislike percent:</h2>
+									<input
+										class="setting_text"
+										type="number"
+										min="0"
+										max="100"
+										bind:value={video.dislikePercent}
+									/>
+								</div>
+
+								{#if index == 0}
+									<p class="setting_info">What is the chance of the bot disliking the video?</p>
+								{/if}
+							</div>
+
+							<h1 class="setting_discloser">Comment list</h1>
+
+							<div class="import_line">
+								<button
+									class="new_button_account"
+									on:click={() => {
+										video.comments.unshift('Hello world');
+
+										video = video;
+									}}>Add comment</button
+								>
+
+								<input
+									id="hidden_comment_input-{index}"
+									type="file"
+									accept=".json"
+									on:change={(e) => {
+										let file = e.target.files[0];
+										let reader = new FileReader();
+										reader.onload = function (e) {
+											let data = e.target.result;
+
+											socket.emit('comments_import', {
+												data: data,
+												video: video
+											});
+
+											setTimeout(() => {
+												document.location.reload();
+											}, 250);
+										};
+
+										reader.readAsArrayBuffer(file);
+									}}
+									hidden
+								/>
+
+								<button
+									class="new_button_account"
+									on:click={() => {
+										let hidden_input = document.querySelector(`#hidden_comment_input-${index}`);
+										hidden_input?.click();
+									}}>Import comments</button
+								>
+
+								<button
+									class="new_button_account"
+									on:click={() => {
+										const a = document.createElement('a');
+										const url = `/api/video_details?type=comments&video=${video.id}`;
+										a.href = url;
+										document.body.appendChild(a);
+										a.click();
+										document.body.removeChild(a);
+									}}>Extract comments</button
+								>
+
+								<div class="accounts_container">
+									{#each video.comments as comment, comment_index}
+										<div class="account_container container_gray">
+											<button
+												class="video_id"
+												on:click={() => {
+													video.comments.splice(comment_index, 1);
+													video.comment = video.comments;
+												}}>#{comment_index + 1}</button
+											>
+
+											<textarea
+												class="setting_text comment_text"
+												cols="50"
+												bind:value={comment}
+											/>
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
 					{/if}
 				</div>
 			{/each}
@@ -525,6 +633,30 @@
 </div>
 
 <style lang="scss">
+	.comment_text {
+		height: 25vh;
+		width: 95%;
+		margin-top: 5%;
+
+	}
+
+	.accounts_container {
+		display: flex;
+		overflow-x: scroll;
+
+		gap: 4%;
+		margin-left: 3%;
+	}
+
+	.import_line {
+		display: flex;
+		gap: 5%;
+
+		flex-wrap: wrap;
+		justify-content: center;
+		margin-top: 2.5%;
+	}
+
 	.video_type {
 		text-align: center;
 		font-size: 1.5em;
@@ -580,16 +712,19 @@
 	}
 
 	.account_container {
-		max-width: 96%;
-		margin-left: 2%;
+		margin-left: 1%;
+		margin-bottom: 2%;
 		margin-top: 3%;
-		padding-bottom: 1%;
+
+		min-width: 50%;
 	}
+
 	.watchtime_line {
 		color: beige;
 		font-size: 1em;
 		text-align: center;
 	}
+
 	.video_id {
 		margin-top: 2%;
 		background-color: red;
@@ -604,6 +739,7 @@
 		font-size: 1.25em;
 		font-weight: bold;
 	}
+
 	.new_button {
 		max-width: 70%;
 		min-width: 70%;
@@ -620,12 +756,8 @@
 	}
 
 	.new_button_account {
-		max-width: 50%;
-		min-width: 50%;
-
-		padding: 0;
-		margin-top: 2.5%;
-		margin-left: 25%;
+		padding-left: 1vw;
+		padding-right: 1vw;
 
 		background-color: rgb(0, 128, 0);
 		color: beige;
@@ -634,9 +766,6 @@
 
 	.container_gray {
 		box-shadow: 0 0 8px 3px rgba(0, 0, 0, 0.952);
-	}
-
-	.different_line {
 	}
 
 	.same_line {
