@@ -9,13 +9,12 @@ module.exports = (data, socket) => {
     }
 
     for (let comment of data) {
-        if(typeof comment !== "string") {
+        if(typeof comment !== "string" ) {
             break
         }
 
         video_found.comments.push(comment)
     }
-
 
     for (let video of videos) {
         if (video.id == data.video.id) video = video_found
