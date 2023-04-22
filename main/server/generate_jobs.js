@@ -74,9 +74,9 @@ function generateJob(work_video, work_proxies, video_id, videoInfo, work_account
             commentAt: random(work_video.commentAt[0], work_video.commentAt[1]),
         }
 
-        if(job.account.like && job.watch_time < (ob.account.likeAt + 10)) {job.watch_time = job.account.likeAt + 10}
-        if(job.account.dislike && job.watch_time < (ob.account.dislikeAt + 10)) {job.watch_time = job.account.dislikeAt + 10}
-        if(job.account.comment && job.watch_time < (ob.account.commentAt + 10)) {job.watch_time = job.account.commentAt + 10}
+        if(job.account.like && job.watch_time < (job.account.likeAt + 10)) {job.watch_time = job.account.likeAt + 10}
+        if(job.account.dislike && job.watch_time < (job.account.dislikeAt + 10)) {job.watch_time = job.account.dislikeAt + 10}
+        if(job.account.comment && job.watch_time < (job.account.commentAt + 10)) {job.watch_time = job.account.commentAt + 10}
     }
 
     jobs.push(job)
