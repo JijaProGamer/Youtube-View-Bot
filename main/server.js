@@ -144,7 +144,8 @@ async function startWorking() {
                         let work_proxies = proxyStats.good.map((v) => v = v.url)
 
                         for (let video of work_videos) {
-                            await generateJobs(video, work_proxies)
+                            if(video.id.trim().length >= 7)
+                                await generateJobs(video, work_proxies)
                         }
                     }
 
