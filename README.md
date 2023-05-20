@@ -43,6 +43,9 @@ https://www.patreon.com/Bloxxy213/membership
  * [Getting started](https://github.com/JijaProGamer/youtubeWatchBot/wiki/Getting-started)
  * [Proxies](https://github.com/JijaProGamer/youtubeWatchBot/wiki/Proxies)
 
+# IPRoyal Referral
+ * https://iproyal.com?r=162918
+ 
 # Contacting me
 
 Do not contact me until you've read all the wiki.
