@@ -4,7 +4,7 @@ async function getHealth(minimal, multiple) {
     let main = {}
     let nodes = []
 
-    if (minimal) {
+    if (minimal) {        
         let [memory, cpu, load, temperature] = await Promise.all([
             systeminformation.mem(),
             systeminformation.cpu(),
@@ -42,7 +42,7 @@ async function getHealth(minimal, multiple) {
 }
 
 function repeat() {
-    getHealth(false, true).then(() => {
+    getHealth(true, true).then(() => {
         setTimeout(() => {
             repeat()
         }, 5000)

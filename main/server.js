@@ -65,7 +65,7 @@ process.on("SIGINT", () => {
         child.kill("SIGINT")
     }
 
-    if(watchInterval){
+    if (watchInterval) {
         clearInterval(watchInterval)
         watchInterval = undefined
     }
@@ -144,7 +144,7 @@ async function startWorking() {
                         let work_proxies = proxyStats.good.map((v) => v = v.url)
 
                         for (let video of work_videos) {
-                            if(video.id.trim().length >= 7)
+                            if (video.id.trim().length >= 7)
                                 await generateJobs(video, work_proxies)
                         }
                     }
@@ -169,65 +169,72 @@ async function startWorking() {
 
             lastInterval = setInterval(async () => {
                 if (Date.now() > (settings.concurrencyInterval * 1000 + lastOpened)) {
-                    let cpuLoad = lastHealth.main.load.currentLoad
-                    let ramLoad = (lastHealth.main.memory.active / lastHealth.main.memory.total) * 100
 
-                    if (currentOpen < currentConcurrency && !(settings.stop_spawning_on_overload && (cpuLoad > 95 || ramLoad > 90))) {
-                        lastOpened = Date.now()
+                    if (settings.stop_spawning_on_overload) {
+                        if (!lastHealth) return
 
-                        let currentJob = jobs[currentWorker + 1]
-                        if (currentJob) {
+                        let cpuLoad = lastHealth.main.load.currentLoad
+                        let ramLoad = (lastHealth.main.memory.active / lastHealth.main.memory.total) * 100
 
-                            currentOpen += 1
-                            currentWorker += 1
+                        if (cpuLoad > 95 || ramLoad > 90) return
+                    }
 
-                            let tempWorker = currentWorker
-                            let userDataDir = tempWorker
+                    if (currentOpen >= currentConcurrency) return
 
-                            if (typeof availableUserDataDirs[0] !== "undefined") {
-                                userDataDir = availableUserDataDirs.shift()
-                            }
+                    lastOpened = Date.now()
 
-                            let worker = {
-                                job: currentJob,
-                                logs: [],
+                    let currentJob = jobs[currentWorker + 1]
+                    if (currentJob) {
+                        currentOpen += 1
+                        currentWorker += 1
 
-                                id: v4(),
+                        let tempWorker = currentWorker
+                        let userDataDir = tempWorker
 
-                                bandwidth: 0,
-                                currentTime: 0,
+                        if (typeof availableUserDataDirs[0] !== "undefined") {
+                            userDataDir = availableUserDataDirs.shift()
+                        }
 
-                                startTime: Date.now(),
-                                video_info: currentJob.video_info,
-                            }
+                        let worker = {
+                            job: currentJob,
+                            logs: [],
 
-                            workers.push(worker)
-                            io.emit("update_workers", workers)
+                            id: v4(),
 
-                            let [err, result] = await to(startWorker(currentJob, worker, userDataDir))
-                            if(err && !err.includes("Session closed. Most likely the page has been closed.") && !err.includes("browser has disconnected")) {
-                                console.log(err)
-                            }
+                            bandwidth: 0,
+                            currentTime: 0,
 
-                            workers = workers.filter((v) => v.id !== worker.id)
-                            workers_finished.push(worker)
+                            startTime: Date.now(),
+                            video_info: currentJob.video_info,
+                        }
 
-                            availableUserDataDirs.push(userDataDir)
+                        workers.push(worker)
+                        io.emit("update_workers", workers)
 
-                            io.emit("update_workers", workers)
+                        let [err, result] = await to(startWorker(currentJob, worker, userDataDir))
+                        if (err && !err.includes("Session closed. Most likely the page has been closed.") && !err.includes("browser has disconnected")) {
+                            console.log(err)
+                        }
 
-                            currentOpen -= 1
-                            workersFinished += 1
+                        workers = workers.filter((v) => v.id !== worker.id)
+                        workers_finished.push(worker)
 
-                            if (workersFinished == maxWorkers) {
-                                clearInterval(lastInterval)
-                                lastInterval = undefined
+                        availableUserDataDirs.push(userDataDir)
 
-                                workingStatus = 0
-                                startWorking(0)
-                            }
+                        io.emit("update_workers", workers)
+
+                        currentOpen -= 1
+                        workersFinished += 1
+
+                        if (workersFinished == maxWorkers) {
+                            clearInterval(lastInterval)
+                            lastInterval = undefined
+
+                            workingStatus = 0
+                            startWorking(0)
                         }
                     }
+
                 }
             }, 1000)
 
