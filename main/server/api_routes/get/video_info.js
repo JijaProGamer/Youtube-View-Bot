@@ -12,6 +12,8 @@ let db_get_video = db.prepare(`SELECT data FROM video_cache WHERE id = ?`)
 
 module.exports = (req, res) => {
     let id = selfbot_api.getID(req.query.id)
+    if(typeof(id) !== 'string' || id.trim().length < 11) return res.sendStatus(404)
+
     if (cache[id]) return res.send(cache[id])
     if (blacklist.includes(id)) return res.sendStatus(404)
 
@@ -53,6 +55,8 @@ module.exports = (req, res) => {
         }).catch((err) => {
             //console.log(err)
             db_insert_video.run("false", id)
+            blacklist.push(id)
+
             res.sendStatus(404)
         })
     }
