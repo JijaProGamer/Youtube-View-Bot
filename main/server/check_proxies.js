@@ -1,4 +1,5 @@
 import createProxyTester from 'fast-proxy-tester';
+const ytdl = require('ytdl-core');
 
 function checkProxies(proxies) {
     return new Promise((resolve, reject) => {
@@ -24,77 +25,61 @@ function checkProxies(proxies) {
                     resolved = true
                     resolve()
                 },
-            })
+            });
 
-            tester.testPrivacy().then((result) => {
-                finished += 1
+            (async () => {
+                try {
+                    function onError(error){
+                        finished ++
 
-                if (!resolved) {
-                    if (result.privacy == "elite") {
-                        tester.fastTest(`https://www.youtube.com`).then((result) => {
-                            proxyStats.good.push({ url: proxy, latency: result.latency })
+                        if (error == "timeout") {
+                            proxyStats.bad.push({ url: proxy, err: "proxy is too slow" })
                             proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
 
-                            good_proxies = proxyStats.good
-                            db.prepare("UPDATE good_proxies SET data = ? WHERE id = 1").run(JSON.stringify(good_proxies))
                             io.emit("newProxiesStats", proxyStats)
+                        } else {
+                            proxyStats.bad.push({ url: proxy, err: error.message })
+                            proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
 
-                            if (finished == needed) {
-                                resolved = true
-                                resolve()
-                            }
-                        }).catch((error) => {
-                            if (error == "timeout") {
-                                proxyStats.bad.push({ url: proxy, err: "proxy is too slow" })
-                                proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
-
-                                io.emit("newProxiesStats", proxyStats)
-                            } else {
-                                proxyStats.bad.push({ url: proxy, err: error.message })
-                                proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
-
-                                io.emit("newProxiesStats", proxyStats)
-                            }
-
-                            if (finished == needed) {
-                                resolved = true
-                                resolve()
-                            }
-                        })
-                    } else {
+                            io.emit("newProxiesStats", proxyStats)
+                        }
+                        throw err
+                    }
+    
+                    let privacy = await tester.testPrivacy().catch(onError)
+                    if (privacy.privacy !== "elite") {
                         proxyStats.bad.push({ url: proxy, err: "Proxy is leaking IP address" })
                         proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
 
                         io.emit("newProxiesStats", proxyStats)
-
-                        if (finished == needed) {
-                            resolved = true
-                            resolve()
-                        }
+                        return
                     }
-                }
-            }).catch((error) => {
-                finished += 1
 
-                if (!resolved) {
-                    if (error == "timeout") {
-                        proxyStats.bad.push({ url: proxy, err: "proxy is too slow" })
+                    let test1Result = await tester.fastTest(`https://www.youtube.com`).catch(onError)
+                    if(test1Result.status !== 200){
+                        proxyStats.bad.push({ url: proxy, err: "Proxy is unable to connect to youtube servers" })
                         proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
 
                         io.emit("newProxiesStats", proxyStats)
-                    } else {
-                        proxyStats.bad.push({ url: proxy, err: error.message })
-                        proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
-
-                        io.emit("newProxiesStats", proxyStats)
+                        return
                     }
+
+                    await ytdl.getBasicInfo("dQw4w9WgXcQ").catch(onError) // Test 2 YTDL
+
+                    proxyStats.good.push({ url: proxy, latency: test1Result.latency })
+                    proxyStats.untested = proxyStats.untested.filter((v) => v.url !== proxy)
+
+                    finished ++
+                    good_proxies = proxyStats.good
+                    db.prepare("UPDATE good_proxies SET data = ? WHERE id = 1").run(JSON.stringify(good_proxies))
+                    io.emit("newProxiesStats", proxyStats)
 
                     if (finished == needed) {
                         resolved = true
                         resolve()
                     }
-                }
-            })
+                } catch (err) {}
+            })()
         }
     })
 }

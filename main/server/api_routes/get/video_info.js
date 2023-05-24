@@ -1,4 +1,4 @@
-const ytdl = require('better-ytdl-core');
+const ytdl = require('ytdl-core');
 const youtubeSelfbotApi = require("youtube-selfbot-api")
 
 let selfbot_api = new youtubeSelfbotApi()
@@ -21,10 +21,9 @@ module.exports = (req, res) => {
     if(videoFromDB){
         res.json(JSON.parse(videoFromDB.data))
     } else if (videoFromDB == "false"){
-        blacklist.push(id)
         res.sendStatus(404)
     } else {
-        ytdl.getInfo(id).then((videoInfo) => {
+        ytdl.getBasicInfo(id).then((videoInfo) => {
             let vFormats = videoInfo.formats.filter((v) => v.width && v.height)
             let vFormat = vFormats.sort((a, b) => a.width - b.width).shift()
             let max_vFormat = vFormats.sort((a, b) => a.width - b.width).pop()
