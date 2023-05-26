@@ -56,7 +56,7 @@
     "uuid": "^9.0.0",
     "vm2": "^3.9.14",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz",
-    "youtube-selfbot-api": "^3.4.5",
+    "youtube-selfbot-api": "^3.4.6",
     "ytdl-core": "^4.11.4"
   }
 }
