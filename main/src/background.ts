@@ -5,6 +5,7 @@ import io from 'socket.io-client';
 let socket = io("/", {
     autoConnect: true,
     reconnectionDelayMax: 1000,
+    secure: false,
 });
 
 let opts: Options = {
@@ -23,6 +24,7 @@ let opts: Options = {
     stop_spawning_on_overload: true,
     auto_skip_ads: true,
     default_proxy_protocol: "http",
+    kill_zombies: true,
 };
 
 let lastData: Options = deepCopy(opts);

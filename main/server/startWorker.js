@@ -3,6 +3,7 @@ import { default as youtube_selfbot_api } from "youtube-selfbot-api"
 import { to } from "await-to-js"
 import * as path from "path"
 import { v4 } from "uuid"
+import { writeFileSync } from "fs"
 
 let db_insert_watch_time = db.prepare(`INSERT OR IGNORE INTO watch_time (date, value) VALUES (?, ?)`)
 let db_update_watch_time = db.prepare(`UPDATE watch_time SET value = value + ? WHERE date = ?`)
@@ -115,22 +116,11 @@ function startWorker(job, worker, userDataDir) {
             proxy: job.proxy,
             no_visuals: settings.no_visuals,
             autoSkipAds: settings.auto_skip_ads,
-            timeout: settings.proxyTimeout * 1000,
-            cacheDB: {
-                save: (url, data) => {
-                    db_set_database.run(url, JSON.stringify(data))
-                },
-                get: (url) => {
-                    let result = db.prepare(`SELECT data FROM cache WHERE url = ?`).get(url)
-                    let data = result && result.data && JSON.parse(result.data)
-                    if(!data) return
-
-                    return {...data, body: Buffer.from(data.body)}
-                }
-            }
+            timeout: settings.proxyTimeout * 1000
         })
 
         let browser
+        let pid
         let failed = false
 
         children.push({
@@ -138,10 +128,14 @@ function startWorker(job, worker, userDataDir) {
             type: "process",
             kill: async function () {
                 if (browser) {
+                    worker_zombies.all = worker_zombies.all.filter(element => element !== pid);
+                    worker_zombies.current = worker_zombies.current.filter(element => element !== pid);
+
                     let [close_browser_err] = await to(browser.close())
                     browser = undefined
 
-                    if (close_browser_err) return reject(`Error closing the browser: ${close_browser_err}`)
+                    if (close_browser_err && !close_browser_err.message.includes("Target closed")) 
+                        return reject(`Error closing the browser: ${close_browser_err}`)
                 } else if(!failed) {
                     let interval = setInterval(() => {
                         if(browser){
@@ -154,6 +148,15 @@ function startWorker(job, worker, userDataDir) {
         })
 
         let [launch_error, globalBrowser] = await to(bot.launch())
+
+        if(globalBrowser){
+            pid = globalBrowser.process().pid
+            worker_zombies.current.push(pid)
+            worker_zombies.all.push(pid)
+
+            writeFileSync(path.join(__dirname, `../clients.json`), JSON.stringify(worker_zombies), "utf-8")
+        }
+
         if (launch_error) {
             failed = true
             return reject(`Error spawning browser: ${launch_error.message}, ${launch_error.name}`)
@@ -236,6 +239,8 @@ function startWorker(job, worker, userDataDir) {
             kill: async function () {
                 this.killed = true
                 workingList = workingList.filter(w => w.id !== this.id)
+                worker_zombies.all = worker_zombies.all.filter(element => element !== pid);
+                worker_zombies.current = worker_zombies.current.filter(element => element !== pid);
 
                 if (browser) {
                     let [close_browser_err] = await to(browser.close())

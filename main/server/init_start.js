@@ -9,7 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 } from 'uuid';
 import { NodeVM } from 'vm2';
-import { readFileSync, readdirSync } from "fs"
+import { existsSync, readFileSync, readdirSync } from "fs"
 
 import { createRequire } from "module";
 import { defaultServerInfo } from "./vars.js"
@@ -106,6 +106,9 @@ let getChrome = () => {
 }
 
 let settings = db.prepare(`SELECT * FROM options`).pluck().get()
+global.worker_zombies = JSON.parse(readFileSync(path.join(__dirname, "../clients.json"), "utf-8"))
+worker_zombies.current = []
+
 if (!settings) {
     getChrome().then((chromePath) => {
         settings = {...defaultServerInfo, chromePath}

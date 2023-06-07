@@ -17,6 +17,10 @@ so I will be thankfull for any donation
 if you consider to support me, my patreon is 
 https://www.patreon.com/Bloxxy213/membership
 
+# Comprehensive Tutorial and Extensive Documentation
+
+<a href="https://www.bloxxy.net/projects/1">Explore the documentation page</a>
+
 
 # Requirements
 

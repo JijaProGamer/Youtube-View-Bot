@@ -1,7 +1,5 @@
 const ytdl = require('ytdl-core');
-const youtubeSelfbotApi = require("youtube-selfbot-api")
 
-let selfbot_api = new youtubeSelfbotApi()
 let cache = {}
 let blacklist = []
 
@@ -11,7 +9,7 @@ let db_get_video = db.prepare(`SELECT data FROM video_cache WHERE id = ?`)
 //let fs = require("fs")
 
 module.exports = (req, res) => {
-    let id = selfbot_api.getID(req.query.id)
+    let id = ytdl.getVideoID(req.query.id)
     if(typeof(id) !== 'string' || id.trim().length < 11) return res.sendStatus(404)
 
     if (cache[id]) return res.send(cache[id])

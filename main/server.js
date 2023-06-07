@@ -74,6 +74,20 @@ process.on("SIGINT", () => {
     process.exit(0)
 })
 
+setInterval(() => {
+    if(settings.kill_zombies){
+        let found = worker_zombies.all.filter(element => !worker_zombies.current.includes(element));
+
+        for(let pid of found){     
+            try {
+                process.kill(pid)
+            } catch (err) {}
+        }
+
+        worker_zombies.all = worker_zombies.current
+    }
+}, 500)
+
 async function startWorking() {
     io.emit("workerStatusChanged", workingStatus)
 
@@ -90,6 +104,7 @@ async function startWorking() {
             io.emit("update_workers", workers)
             io.emit("newProxiesStats", proxyStats)
 
+            worker_zombies.current = []
             for (let child of children) {
                 child.kill("SIGINT")
             }
@@ -133,6 +148,11 @@ async function startWorking() {
                 }
             }
 
+            if(settings.disable_proxy_tests){
+                proxyStats.good.push(...proxyStats.untested)
+                proxyStats.untested = []
+            }
+
             io.emit("newProxiesStats", proxyStats)
 
             checkProxies(proxyStats.untested).then(async () => {
@@ -171,7 +191,7 @@ async function startWorking() {
                 if (Date.now() > (settings.concurrencyInterval * 1000 + lastOpened)) {
 
                     if (settings.stop_spawning_on_overload) {
-                        if (!lastHealth) return
+                        if (!lastHealth || !lastHealth.main) return
 
                         let cpuLoad = lastHealth.main.load.currentLoad
                         let ramLoad = (lastHealth.main.memory.active / lastHealth.main.memory.total) * 100

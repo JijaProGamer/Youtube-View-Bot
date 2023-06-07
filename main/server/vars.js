@@ -39,4 +39,6 @@ export let defaultServerInfo = {
     disable_proxy_tests: false,
     proxy_tests_headless: false,
     default_proxy_protocol: "http",
+
+    kill_zombies: true,
 }

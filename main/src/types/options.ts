@@ -14,4 +14,5 @@ export type Options = {
     auto_skip_ads: boolean,
     server_port: number,
     default_proxy_protocol: string,
+    kill_zombies: boolean,
 };

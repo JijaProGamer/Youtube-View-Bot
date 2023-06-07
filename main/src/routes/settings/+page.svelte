@@ -103,6 +103,20 @@
 
 				<p class="setting_info">Should it stop spawning workers when RAM/CPU is at 95%?</p>
 			</div>
+
+			<div class="setting_div">
+				<div class="same_line">
+					<h2 class="setting_name">Kill zombie browsers:</h2>
+
+					<input
+						class="setting_button setting_checkbox"
+						type="checkbox"
+						bind:checked={data.kill_zombies}
+					/>
+				</div>
+
+				<p class="setting_info">Kill zombie browsers left by windows?</p>
+			</div>
 		</div>
 
 		<div class="settings_container container_red">
