@@ -232,7 +232,7 @@ async function startWorking() {
                         io.emit("update_workers", workers)
 
                         let [err, result] = await to(startWorker(currentJob, worker, userDataDir))
-                        if (err && !err.includes("Session closed. Most likely the page has been closed.") && !err.includes("browser has disconnected")) {
+                        if (err && !err.includes("closed") && !err.includes("disconnected") && !err.includes("Protocol")) {
                             console.log(err)
                         }
 

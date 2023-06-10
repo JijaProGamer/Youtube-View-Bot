@@ -8,8 +8,23 @@ let db_get_video = db.prepare(`SELECT data FROM video_cache WHERE id = ?`)
 
 //let fs = require("fs")
 
+function getID(url) {
+    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm
+    let found = regex.exec(url)
+
+    if (found && found.length > 1 && found[3]) {
+        return found[3]
+    } else {
+        if (url.length >= 11 && url.length <= 12) {
+            return url
+        }
+    }
+
+    return
+}
+
 module.exports = (req, res) => {
-    let id = ytdl.getVideoID(req.query.id)
+    let id = getID(req.query.id)
     if(typeof(id) !== 'string' || id.trim().length < 11) return res.sendStatus(404)
 
     if (cache[id]) return res.send(cache[id])

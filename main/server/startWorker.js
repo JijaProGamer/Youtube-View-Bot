@@ -123,19 +123,27 @@ function startWorker(job, worker, userDataDir) {
         let pid
         let failed = false
 
+        async function processErr(err){
+            worker_zombies.all = worker_zombies.all.filter(element => element !== pid);
+            worker_zombies.current = worker_zombies.current.filter(element => element !== pid);
+
+            if(browser){
+                await to(browser.close())
+                browser = undefined
+            }
+
+            if(pid)
+                try { process.kill(pid, "SIGKILL") } catch(err){} 
+            
+            reject(err)
+        }
+
         children.push({
             child: browser,
             type: "process",
             kill: async function () {
                 if (browser) {
-                    worker_zombies.all = worker_zombies.all.filter(element => element !== pid);
-                    worker_zombies.current = worker_zombies.current.filter(element => element !== pid);
-
-                    let [close_browser_err] = await to(browser.close())
-                    browser = undefined
-
-                    if (close_browser_err && !close_browser_err.message.includes("Target closed")) 
-                        return reject(`Error closing the browser: ${close_browser_err}`)
+                    processErr()
                 } else if(!failed) {
                     let interval = setInterval(() => {
                         if(browser){
@@ -159,7 +167,7 @@ function startWorker(job, worker, userDataDir) {
 
         if (launch_error) {
             failed = true
-            return reject(`Error spawning browser: ${launch_error.message}, ${launch_error.name}`)
+            return processErr(`Error spawning browser: ${launch_error.message}, ${launch_error.name}`)
         }
 
         browser = globalBrowser
@@ -186,7 +194,7 @@ function startWorker(job, worker, userDataDir) {
         })
 
         let [new_page_err, page] = await to(browser.newPage())
-        if (new_page_err) return reject(`Error starting a new page: ${new_page_err}`)
+        if (new_page_err) return processErr(`Error starting a new page: ${new_page_err}`)
 
         let googleContext
 
@@ -198,13 +206,13 @@ function startWorker(job, worker, userDataDir) {
             } catch (err) { }
 
             let [google_setup_err, googleContext] = await to(page.setupGoogle(job.account, cookies))
-            if (google_setup_err) return reject(`Error creating google context: ${google_setup_err}`)
+            if (google_setup_err) return processErr(`Error creating google context: ${google_setup_err}`)
 
             let [google_login_err] = await to(googleContext.login(job.account))
-            if (google_login_err) return reject(`Error logging into google: ${google_login_err}`)
+            if (google_login_err) return processErr(`Error logging into google: ${google_login_err}`)
         } else {
             let [clear_storage_err] = await to(browser.clearStorage())
-            if (clear_storage_err) return reject(`Error clearing storage: ${clear_storage_err}`)
+            if (clear_storage_err) return processErr(`Error clearing storage: ${clear_storage_err}`)
         }
 
         let [goto_video_err, watcherContext] = await to(page.gotoVideo(job.watch_type, job.id, {
@@ -213,11 +221,11 @@ function startWorker(job, worker, userDataDir) {
             filters: job.filters,
         }))
 
-        if (goto_video_err) return reject(`Error going to the video: ${goto_video_err}`)
+        if (goto_video_err) return processErr(`Error going to the video: ${goto_video_err}`)
 
         if (!job.video_info.isLive) {
             let [week_err] = await to(watcherContext.seek(0))
-            if (week_err) return reject(`Error seeking to the start of the video: ${week_err}`)
+            if (week_err) return processErr(`Error seeking to the start of the video: ${week_err}`)
         }
 
         let workerHolder = {
@@ -242,11 +250,14 @@ function startWorker(job, worker, userDataDir) {
                 worker_zombies.all = worker_zombies.all.filter(element => element !== pid);
                 worker_zombies.current = worker_zombies.current.filter(element => element !== pid);
 
-                if (browser) {
-                    let [close_browser_err] = await to(browser.close())
-                    if (close_browser_err) return reject(`Error closing the browser: ${close_browser_err}`)
+                if(browser){
+                    await to(browser.close())
                     browser = undefined
                 }
+    
+                if(pid)
+                    try { process.kill(pid, "SIGKILL") } catch(err){} 
+
             },
             fail: async function (err) {
                 await this.kill()
@@ -260,23 +271,25 @@ function startWorker(job, worker, userDataDir) {
 
         workingList.push(workerHolder)
 
-        browser.on("videoStateChanged", async (lastState, newState) => {
-            if (newState == "FINISHED") {
-                await workerHolder.finish()
-            }
-        })
-
-        if (job.account && job.video_info.isLive) {
-            if (job.account.like) {
-                await googleContext.like()
-            }
-
-            if (job.account.dislike) {
-                await googleContext.dislike()
-            }
-
-            if (job.account.comment) {
-                await googleContext.comment(job.account.comment)
+        if(browser){
+            browser.on("videoStateChanged", async (lastState, newState) => {
+                if (newState == "FINISHED") {
+                    await workerHolder.finish()
+                }
+            })
+    
+            if (job.account && job.video_info.isLive) {
+                if (job.account.like) {
+                    await googleContext.like()
+                }
+    
+                if (job.account.dislike) {
+                    await googleContext.dislike()
+                }
+    
+                if (job.account.comment) {
+                    await googleContext.comment(job.account.comment)
+                }
             }
         }
     })

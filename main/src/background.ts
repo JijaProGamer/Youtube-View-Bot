@@ -33,7 +33,6 @@ let newData = (data: any) => {
     opts = data
 }
 
-
 let dataChanged = (newFunc: any) => dataChangeFunc = newFunc
 
 function deepCopy(obj: any): any {
