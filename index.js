@@ -47,7 +47,7 @@ runServer().then((srv_data) => {
         })
 
         win.webContents.on('will-navigate', function (e, url) {
-            if (url.includes("patreon") || url.includes("github") || url.includes("paypal")) {
+            if (url.includes("patreon") || url.includes("github") || url.includes("paypal") || url.includes("bloxxy.net")) {
                 e.preventDefault();
                 shell.openExternal(url);
             }

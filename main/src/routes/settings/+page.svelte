@@ -187,6 +187,39 @@
 			{/if}
 		</div>
 	</div>
+
+	<div id="first_settings_tab">
+		<div class="settings_container container_rainbow">
+			<div class="setting_div">
+				<div class="same_line">
+					<h2 class="setting_name">Full feature access</h2>
+				</div>
+
+				<div class="same_line">
+					<p>
+						Subscribe to our patreon with a subscription of minimum 10 dollars per month for full
+						feature access.
+					</p>
+				</div>
+
+				<div class="same_line">
+					<p>
+						To get access to the full list of features, make an account on <a
+							href="https://www.bloxxy.net/">our website</a
+						>, log in with your patreon and make a 10$ subsription on our
+						<a href="https://www.patreon.com/Bloxxy213/membership">patreon</a>.
+					</p>
+				</div>
+
+				<div class="same_line">
+					<p>
+						After making a account and logging in with your patreon, copy your API Key and paste it
+						here: <input type="text" />
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <style lang="scss">
@@ -251,6 +284,27 @@
 
 	.container_red {
 		box-shadow: 0 0 6px 2px rgba(233, 20, 5, 0.856);
+	}
+
+	.container_rainbow {
+		/*box-shadow: 0 0 9px rgba(148, 0, 211, 1), 0px 0px 0px 6px rgba(75, 0, 130, 1),
+			0px 0px 0px 9px rgba(0, 0, 255, 1), 0px 0px 0px 12px rgba(0, 255, 0, 1),
+			0px 0px 0px 15px rgba(255, 255, 0, 1), 0px 0px 0px 18px rgba(255, 127, 0, 1),
+			0px 0px 0px 21px rgba(255, 0, 0, 1);*/
+		animation: rainbow-shadow 3s infinite linear;
+	}
+
+	@keyframes rainbow-shadow {
+		0% {
+			box-shadow: 0 0 10px #ff0000, 0 0 20px #ff7f00, 0 0 30px #ffff00, 0 0 40px #00ff00,
+				0 0 50px #0000ff, 0 0 60px #4b0082, 0 0 70px #9400d3;
+		}
+		100% {
+			box-shadow: 0 0 10px #ff0000, 0 0 20px #ff7f00, 0 0 30px #ffff00, 0 0 40px #00ff00,
+				0 0 50px #0000ff, 0 0 60px #4b0082, 0 0 70px #9400d3, 0 0 80px #ff0000, 0 0 90px #ff7f00,
+				0 0 100px #ffff00, 0 0 110px #00ff00, 0 0 120px #0000ff, 0 0 130px #4b0082,
+				0 0 140px #9400d3;
+		}
 	}
 
 	#form_container {

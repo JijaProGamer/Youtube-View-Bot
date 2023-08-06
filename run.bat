@@ -1,2 +1,2 @@
-electron --disable-gpu --js-flags=--max-old-space-size=8192 ./index.js
+electron --js-flags=--max-old-space-size=8192 ./index.js
 pause
