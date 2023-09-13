@@ -4,7 +4,6 @@ import http from "http"
 import session from "express-session"
 import Database from "better-sqlite3"
 import SQLite3Session from "better-sqlite3-session-store"
-import { findChrome } from 'find-chrome-bin'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 } from 'uuid';
@@ -30,11 +29,11 @@ const io = new Server(server)
 
 //app.set('trust proxy', 1)
 
-function random(min, max){
-    if(max){
+function random(min, max) {
+    if (max) {
         return min + Math.floor(Math.random() * (max - min))
     } else {
-        if(typeof min == "object"){
+        if (typeof min == "object") {
             return min[random(min.length)]
         } else {
             return Math.floor(Math.random() * min)
@@ -75,7 +74,7 @@ db.prepare('INSERT OR IGNORE INTO good_proxies (data, id) VALUES (?, 1)').run(`[
 db.prepare('INSERT OR IGNORE INTO videos (data, id) VALUES (?, 1)').run(`[]`)
 
 let workingStatus = 0
-let proxyStats = {good: [], bad: [], untested: []} 
+let proxyStats = { good: [], bad: [], untested: [] }
 let stats = {}
 let extensions = []
 
@@ -95,32 +94,19 @@ if (!currentSecret) {
     db.prepare('INSERT INTO secret (data) VALUES (?)').run(currentSecret)
 }
 
-let getChrome = () => {
-    return new Promise((resolve) => {
-        findChrome().then((chromePath) => {
-            resolve(chromePath && chromePath.executablePath || "")
-        }).catch((err) => {
-            resolve("")
-        })
-    })
-}
-
 let settings = db.prepare(`SELECT * FROM options`).pluck().get()
-global.worker_zombies = JSON.parse(readFileSync(path.join(__dirname, "../clients.json"), "utf-8"))
-worker_zombies.current = []
 
 if (!settings) {
-    getChrome().then((chromePath) => {
-        settings = {...defaultServerInfo, chromePath}
-        global.settings = settings
-
-        db.prepare('INSERT INTO options (data, id) VALUES (?, 1)').run(JSON.stringify(settings))
-        server.listen(settings.server_port, () => process.stdout.write(`listening|${settings.server_port}`))
-    })
+    settings = defaultServerInfo
+    
+    db.prepare('INSERT INTO options (data, id) VALUES (?, 1)').run(JSON.stringify(settings))
+    server.listen(settings.server_port, () => process.stdout.write(`listening|${settings.server_port}`))
 } else {
     settings = JSON.parse(settings)
     server.listen(settings.server_port, () => process.stdout.write(`listening|${settings.server_port}`))
 }
+
+global.settings = settings
 
 const sessionMiddleware = session({
     secret: currentSecret,
@@ -155,11 +141,11 @@ let makeGlobal = {
     sessionMiddleware,
 }
 
-for (let [key, value] of Object.entries(makeGlobal)){
+for (let [key, value] of Object.entries(makeGlobal)) {
     global[key] = value
 }
 
-for (let extensionPath of readdirSync(path.join(__dirname, "../../extensions"))){
+for (let extensionPath of readdirSync(path.join(__dirname, "../../extensions"))) {
     extensionPath = path.join(__dirname, "../../extensions", extensionPath)
     let extensioninfo = JSON.parse(readFileSync(path.join(extensionPath, "info.json")))
     let extensionVM = new NodeVM({
@@ -169,18 +155,18 @@ for (let extensionPath of readdirSync(path.join(__dirname, "../../extensions")))
             getVideos: () => global.videos,
             transformProxies: (newProxies) => global.proxies = newProxies,
             transformProxies: (newProxies) => global.proxies = newProxies,
-            transformStatus: (newStatus) => {global.workingStatus = newStatus; startWorking()},
-            server_version, 
+            transformStatus: (newStatus) => { global.workingStatus = newStatus; startWorking() },
+            server_version,
             computeTime, getCurrentTime,
         },
         require: {
             external: true,
-            
+
         },
     })
 
     extensionVM.runFile(path.join(extensionPath, "main.js"))
-    extensions.push({...extensioninfo, vm: extensionVM})
+    extensions.push({ ...extensioninfo, vm: extensionVM })
 }
 
 global.extensions = extensions

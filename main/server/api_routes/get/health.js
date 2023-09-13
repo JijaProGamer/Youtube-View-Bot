@@ -41,7 +41,7 @@ async function getHealth(minimal, multiple) {
     return lastHealth
 }
 
-function repeat() {
+/*function repeat() {
     getHealth(true, true).then(() => {
         setTimeout(() => {
             repeat()
@@ -49,7 +49,7 @@ function repeat() {
     })
 }
 
-repeat()
+repeat()*/
 
 module.exports = (req, res) => {
     let minimal = req.query.minimal == "true"

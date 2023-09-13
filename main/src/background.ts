@@ -4,27 +4,23 @@ import axios from "axios";
 import io from 'socket.io-client';
 let socket = io("/", {
     autoConnect: true,
-    reconnectionDelayMax: 1000,
     secure: false,
 });
 
 let opts: Options = {
     skip_ads_after: [5, 85],
     max_seconds_ads: 60,
-    chromePath: "",
     close_server_on_finish: false,
-    no_visuals: false,
     headless: false,
+    api_key: "",
     concurrency: 3,
     concurrencyInterval: 20,
     timeout: 60,
     disable_proxy_tests: false,
-    proxy_tests_headless: false,
     server_port: 6554,
     stop_spawning_on_overload: true,
     auto_skip_ads: true,
     default_proxy_protocol: "http",
-    kill_zombies: true,
 };
 
 let lastData: Options = deepCopy(opts);

@@ -74,20 +74,6 @@ process.on("SIGINT", () => {
     process.exit(0)
 })
 
-setInterval(() => {
-    if(settings.kill_zombies){
-        let found = worker_zombies.all.filter(element => !worker_zombies.current.includes(element));
-
-        for(let pid of found){     
-            try {
-                process.kill(pid)
-            } catch (err) {}
-        }
-
-        worker_zombies.all = worker_zombies.current
-    }
-}, 500)
-
 async function startWorking() {
     io.emit("workerStatusChanged", workingStatus)
 
@@ -104,7 +90,6 @@ async function startWorking() {
             io.emit("update_workers", workers)
             io.emit("newProxiesStats", proxyStats)
 
-            worker_zombies.current = []
             for (let child of children) {
                 child.kill("SIGINT")
             }

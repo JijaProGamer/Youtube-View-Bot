@@ -6,6 +6,7 @@
 	$: newData(data);
 
 	$: changePort(data.server_port);
+	$: changeAPIKey(data.api_key);
 
 	function changePort(newPort: number) {
 		if (newPort < 1024) {
@@ -16,13 +17,11 @@
 			data.server_port = 65535;
 		}
 	}
-</script>
 
-<!-- <button
-	class="setting_button"
-	class:setting_active={data.close_server_on_finish}
-	on:click={() => (data.close_server_on_finish = !data.close_server_on_finish)}
-/> -->
+	function changeAPIKey(newAPIKey: string) {
+		data.api_key = newAPIKey;
+	}
+</script>
 
 <div id="form_container">
 	<div id="first_settings_tab">
@@ -60,7 +59,7 @@
 				</p>
 			</div>
 
-			<div class="setting_div">
+			<!--<div class="setting_div">
 				<div class="same_line">
 					<h2 class="setting_name">Chrome path:</h2>
 
@@ -68,7 +67,7 @@
 				</div>
 
 				<p class="setting_info">Path to a chrome/chromium executable</p>
-			</div>
+			</div>-->
 
 			<div class="setting_div">
 				<div class="same_line">
@@ -103,20 +102,6 @@
 
 				<p class="setting_info">Should it stop spawning workers when RAM/CPU is at 95%?</p>
 			</div>
-
-			<div class="setting_div">
-				<div class="same_line">
-					<h2 class="setting_name">Kill zombie browsers:</h2>
-
-					<input
-						class="setting_button setting_checkbox"
-						type="checkbox"
-						bind:checked={data.kill_zombies}
-					/>
-				</div>
-
-				<p class="setting_info">Kill zombie browsers left by windows?</p>
-			</div>
 		</div>
 
 		<div class="settings_container container_red">
@@ -136,19 +121,6 @@
 				<p class="setting_info">Should the workers be invisible (Lower CPU/RAM usage)?</p>
 			</div>
 
-			<div class="setting_div">
-				<div class="same_line">
-					<h2 class="setting_name">No visuals:</h2>
-
-					<input
-						class="setting_button setting_checkbox"
-						type="checkbox"
-						bind:checked={data.no_visuals}
-					/>
-				</div>
-
-				<p class="setting_info">Should the workers not handle the UI (Lower CPU/RAM usage)?</p>
-			</div>
 
 			<div class="setting_div">
 				<div class="same_line">
@@ -191,18 +163,18 @@
 	<div id="first_settings_tab">
 		<div class="settings_container container_rainbow">
 			<div class="setting_div">
-				<div class="same_line">
+				<div class="same_line premium_title">
 					<h2 class="setting_name">Full feature access</h2>
 				</div>
 
-				<div class="same_line">
+				<div class="same_line premium_line">
 					<p>
 						Subscribe to our patreon with a subscription of minimum 10 dollars per month for full
 						feature access.
 					</p>
 				</div>
 
-				<div class="same_line">
+				<div class="same_line premium_line">
 					<p>
 						To get access to the full list of features, make an account on <a
 							href="https://www.bloxxy.net/">our website</a
@@ -211,11 +183,13 @@
 					</p>
 				</div>
 
-				<div class="same_line">
+				<div class="same_line premium_line">
 					<p>
 						After making a account and logging in with your patreon, copy your API Key and paste it
-						here: <input type="text" />
+						here:
 					</p>
+
+					<input type="text" class="premium_textbox" bind:value={data.api_key}/>
 				</div>
 			</div>
 		</div>
@@ -223,6 +197,35 @@
 </div>
 
 <style lang="scss">
+	.premium_title {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		justify-content: center;
+
+		margin-top: 3%;
+		font-size: 2em;
+
+		box-shadow: 0 0 0 3px rgb(54, 54, 53);
+	}
+
+	.premium_textbox {
+		background-color: rgb(199, 203, 207);
+		color: #232224;
+
+		margin-left: 1%;
+	}
+
+	.premium_line {
+		color: rgb(207, 211, 216);
+		font-size: 1em;
+
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		justify-content: center;
+	}
+
 	.setting_info {
 		font-size: 0.8em;
 		color: rgb(178, 186, 194);
@@ -295,17 +298,23 @@
 	}
 
 	@keyframes rainbow-shadow {
-		0% {
-			box-shadow: 0 0 10px #ff0000, 0 0 20px #ff7f00, 0 0 30px #ffff00, 0 0 40px #00ff00,
-				0 0 50px #0000ff, 0 0 60px #4b0082, 0 0 70px #9400d3;
+		0%, 100% {
+			box-shadow: 0 0 5px #ff0000, 0 0 10px #ff7f00, 0 0 15px #ffff00, 0 0 20px #00ff00,
+				0 0 25px #0000ff, 0 0 30px #4b0082, 0 0 35px #9400d3;
 		}
-		100% {
-			box-shadow: 0 0 10px #ff0000, 0 0 20px #ff7f00, 0 0 30px #ffff00, 0 0 40px #00ff00,
-				0 0 50px #0000ff, 0 0 60px #4b0082, 0 0 70px #9400d3, 0 0 80px #ff0000, 0 0 90px #ff7f00,
-				0 0 100px #ffff00, 0 0 110px #00ff00, 0 0 120px #0000ff, 0 0 130px #4b0082,
-				0 0 140px #9400d3;
+		25% {
+			box-shadow: 0 0 35px #9400d3, 0 0 5px #ff0000, 0 0 10px #ff7f00, 0 0 15px #ffff00, 0 0 20px #00ff00,
+				0 0 25px #0000ff, 0 0 30px #4b0082;
+		}
+		50% {
+			box-shadow: 0 0 30px #4b0082, 0 0 35px #9400d3, 0 0 5px #ff0000, 0 0 10px #ff7f00, 0 0 15px #ffff00, 0 0 20px #00ff00,
+				0 0 25px #0000ff;
+		}
+		75% {
+			box-shadow: 0 0 25px #0000ff, 0 0 30px #4b0082, 0 0 35px #9400d3, 0 0 5px #ff0000, 0 0 10px #ff7f00, 0 0 15px #ffff00, 0 0 20px #00ff00;
 		}
 	}
+
 
 	#form_container {
 		padding-left: 3%;

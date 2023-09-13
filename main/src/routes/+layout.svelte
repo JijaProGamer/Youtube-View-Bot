@@ -4,18 +4,18 @@
 	import { fade } from 'svelte/transition';
 	import axios from 'axios';
 
-	let cpu_load = '0';
+	/*let cpu_load = '0';
 	let memory_usage = '0';
 	let temp = '0';
 
 	let cpu_color = 'gray';
 	let memory_color = 'gray';
 	let temp_color = 'gray';
-	let connected_color = 'gray';
+	let connected_color = 'gray';*/
 
-	let showNavbar = false;
+	let showNavbar = true;
 
-	function changeHealth(health: any) {
+	/*function changeHealth(health: any) {
 		if (!health || !health.load) return;
 
 		cpu_load = health.load.currentLoad.toFixed(1);
@@ -62,7 +62,7 @@
 
 	socket.on('health', (newHealth) => {
 		changeHealth(newHealth.main);
-	});
+	});*/
 
 	let latestHref = window.location.href;
 
@@ -81,7 +81,7 @@
 		}
 	}, 100);
 
-	if (no_navbar !== 'true' && pLocation !== 'login') {
+	/*if (no_navbar !== 'true' && pLocation !== 'login') {
 		axios
 			.get('/api/health?minimal=true&multiple=false')
 			.then((data) => {
@@ -99,7 +99,7 @@
 				temp_color = 'black';
 				connected_color = 'red';
 			});
-	}
+	}*/
 
 	let el = document.querySelector('#slot');
 	let scrollpos_str = localStorage.getItem(`scrollpos-${window.location.href.split("://")[1]}`);
@@ -172,7 +172,7 @@
 					<div id="title">
 						<h4>YOUTUBE WATCH BOT</h4>
 					</div>
-					<div id="actual_stats">
+					<!--<div id="actual_stats">
 						<h2 id="status_title">Status</h2>
 
 						<div class="stats_show">
@@ -196,7 +196,7 @@
 							<div class="stats_green" style="background-color: {temp_color}" />
 							<h2 class="status_subtitle">Temp: {temp}C</h2>
 						</div>
-					</div>
+					</div>-->
 				</div>
 				<div id="sidebar_buttons">
 					<a class="sidebar_button" href="/" class:green_sidebar={pLocation == ''}>

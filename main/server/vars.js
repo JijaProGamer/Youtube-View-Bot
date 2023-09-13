@@ -31,7 +31,6 @@ export let defaultServerInfo = {
     concurrencyInterval: 20,
     stop_spawning_on_overload: true,
 
-    no_visuals: false,
     headless: false,
     auto_skip_ads: true,
 
@@ -39,6 +38,5 @@ export let defaultServerInfo = {
     disable_proxy_tests: false,
     proxy_tests_headless: false,
     default_proxy_protocol: "http",
-
-    kill_zombies: true,
+    api_key: "",
 }

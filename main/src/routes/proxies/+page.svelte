@@ -103,6 +103,7 @@
 				</div>
 
 				<p class="setting_info">Should the application declare all proxies as functional?</p>
+				<p class="setting_info">NOTE: THIS IS EXPERIMENTAL, USE IT AT YOUR OWN RISK! DO NOT REPORT ISSUES ABOUT IT!</p>
 			</div>
 
 			<!--<div class="setting_div">

@@ -14,8 +14,6 @@ let db_update_bandwidth = db.prepare(`UPDATE bandwidth SET value = value + ? WHE
 let db_insert_views = db.prepare(`INSERT OR IGNORE INTO views (date, value) VALUES (?, ?)`)
 let db_update_views = db.prepare(`UPDATE views SET value = value + 1 WHERE date = ?`)
 
-let db_set_database = db.prepare('INSERT OR IGNORE INTO cache (url, data) VALUES (?, ?)')
-
 function clamp(num, min, max) {
     return num <= min ? min : num >= max ? max : num
 }
@@ -110,30 +108,22 @@ function startWorker(job, worker, userDataDir) {
     return new Promise(async (resolve, reject) => {
         let wtfp = !job.isLivestream && (job.video_info.duration / 100) * job.watch_time
 
-        let bot = new youtube_selfbot_api(settings.chromePath, {
+        let bot = new youtube_selfbot_api({
             headless: settings.headless,
             userDataDir: path.join(__dirname, `../cache/raw_guest/${userDataDir}`),
             proxy: job.proxy,
-            no_visuals: settings.no_visuals,
             autoSkipAds: settings.auto_skip_ads,
             timeout: settings.proxyTimeout * 1000
         })
 
         let browser
-        let pid
         let failed = false
 
         async function processErr(err){
-            worker_zombies.all = worker_zombies.all.filter(element => element !== pid);
-            worker_zombies.current = worker_zombies.current.filter(element => element !== pid);
-
             if(browser){
                 await to(browser.close())
                 browser = undefined
             }
-
-            if(pid)
-                try { process.kill(pid, "SIGKILL") } catch(err){} 
             
             reject(err)
         }
@@ -156,14 +146,6 @@ function startWorker(job, worker, userDataDir) {
         })
 
         let [launch_error, globalBrowser] = await to(bot.launch())
-
-        if(globalBrowser){
-            pid = globalBrowser.process().pid
-            worker_zombies.current.push(pid)
-            worker_zombies.all.push(pid)
-
-            writeFileSync(path.join(__dirname, `../clients.json`), JSON.stringify(worker_zombies), "utf-8")
-        }
 
         if (launch_error) {
             failed = true
@@ -247,16 +229,11 @@ function startWorker(job, worker, userDataDir) {
             kill: async function () {
                 this.killed = true
                 workingList = workingList.filter(w => w.id !== this.id)
-                worker_zombies.all = worker_zombies.all.filter(element => element !== pid);
-                worker_zombies.current = worker_zombies.current.filter(element => element !== pid);
 
                 if(browser){
                     await to(browser.close())
                     browser = undefined
                 }
-    
-                if(pid)
-                    try { process.kill(pid, "SIGKILL") } catch(err){} 
 
             },
             fail: async function (err) {
