@@ -295,6 +295,8 @@
 			0px 0px 0px 15px rgba(255, 255, 0, 1), 0px 0px 0px 18px rgba(255, 127, 0, 1),
 			0px 0px 0px 21px rgba(255, 0, 0, 1);*/
 		animation: rainbow-shadow 3s infinite linear;
+		border-radius: 5%;
+
 	}
 
 	@keyframes rainbow-shadow {
