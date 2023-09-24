@@ -290,10 +290,6 @@
 	}
 
 	.container_rainbow {
-		/*box-shadow: 0 0 9px rgba(148, 0, 211, 1), 0px 0px 0px 6px rgba(75, 0, 130, 1),
-			0px 0px 0px 9px rgba(0, 0, 255, 1), 0px 0px 0px 12px rgba(0, 255, 0, 1),
-			0px 0px 0px 15px rgba(255, 255, 0, 1), 0px 0px 0px 18px rgba(255, 127, 0, 1),
-			0px 0px 0px 21px rgba(255, 0, 0, 1);*/
 		animation: rainbow-shadow 3s infinite linear;
 		border-radius: 5%;
 
