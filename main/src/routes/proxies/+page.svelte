@@ -65,6 +65,10 @@
 </script>
 
 <div id="local_container">
+	<a href="https://iproyal.com/?r=162918" id="proxy_ad_url">
+		<img src="https://dashboard.iproyal.com/img/b/728_3.jpg" alt="https://iproyal.com/?r=162918" id="proxy_ad">
+	</a>
+
 	<div id="form_container">
 		<div class="settings_container container_blue">
 			<h1 class="setting_discloser">Proxy settings</h1>
@@ -158,6 +162,17 @@
 </div>
 
 <style lang="scss">
+	#proxy_ad_url {
+		width: 90%;
+		margin-left: 5%;
+	}
+
+	#proxy_ad {
+		width: 90%;
+		margin-left: 5%;
+		height: 100%;
+	}
+
 	.proxy_selector_container {
 		padding: 1%;
 		margin-top: 3%;

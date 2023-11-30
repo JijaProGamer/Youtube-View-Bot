@@ -1,0 +1,1 @@
+electron-packager . Youtube-Watch-Bot --platform=win32 --arch=x64

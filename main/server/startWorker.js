@@ -77,7 +77,8 @@ global.watchInterval = setInterval(() => {
                     workingHolder.disliked = true
 
                     let [dislike_err] = await to(workingHolder.watcherContext.dislike())
-                    if (dislike_err) return workingHolder.fail(`Error disliking video: ${dislike_err}`)                    }
+                    if (dislike_err) return workingHolder.fail(`Error disliking video: ${dislike_err}`)
+                }
             }
 
             if (workingHolder.job.account.comment && !workingHolder.commented) {
@@ -119,12 +120,12 @@ function startWorker(job, worker, userDataDir) {
         let browser
         let failed = false
 
-        async function processErr(err){
-            if(browser){
+        async function processErr(err) {
+            if (browser) {
                 await to(browser.close())
                 browser = undefined
             }
-            
+
             reject(err)
         }
 
@@ -134,9 +135,9 @@ function startWorker(job, worker, userDataDir) {
             kill: async function () {
                 if (browser) {
                     processErr()
-                } else if(!failed) {
+                } else if (!failed) {
                     let interval = setInterval(() => {
-                        if(browser){
+                        if (browser) {
                             this.kill()
                             clearInterval(interval)
                         }
@@ -155,24 +156,22 @@ function startWorker(job, worker, userDataDir) {
         browser = globalBrowser
 
         browser.on("bandwith", (id, type, len) => {
-            len = parseFloat((len / 1e+6).toFixed(2))
+            len = parseFloat((len * 1e-6).toFixed(2))
 
-            if (type !== "document") {
-                var currentTime = getCurrentTime().getTime()
+            var currentTime = getCurrentTime().getTime()
 
-                var alreadyFound = stats.bandwidth.filter((v) => v.date == currentTime)
-                if (!alreadyFound[0]) {
-                    stats.bandwidth.push({ date: currentTime, value: 0 })
-                    db_insert_bandwidth.run(currentTime, 0)
-                }
-
-                stats.bandwidth[stats.bandwidth.length - 1].value += len
-                db_update_bandwidth.run(len, currentTime)
-                worker.bandwidth += len
-
-                io.emit("update_workers", workers)
-                io.emit("increase_bandwidth_amount", len)
+            var alreadyFound = stats.bandwidth.filter((v) => v.date == currentTime)
+            if (!alreadyFound[0]) {
+                stats.bandwidth.push({ date: currentTime, value: 0 })
+                db_insert_bandwidth.run(currentTime, 0)
             }
+
+            stats.bandwidth[stats.bandwidth.length - 1].value += len
+            db_update_bandwidth.run(len, currentTime)
+            worker.bandwidth += len
+
+            io.emit("update_workers", workers)
+            io.emit("increase_bandwidth_amount", len)
         })
 
         let [new_page_err, page] = await to(browser.newPage())
@@ -230,7 +229,7 @@ function startWorker(job, worker, userDataDir) {
                 this.killed = true
                 workingList = workingList.filter(w => w.id !== this.id)
 
-                if(browser){
+                if (browser) {
                     await to(browser.close())
                     browser = undefined
                 }
@@ -248,22 +247,22 @@ function startWorker(job, worker, userDataDir) {
 
         workingList.push(workerHolder)
 
-        if(browser){
+        if (browser) {
             browser.on("videoStateChanged", async (lastState, newState) => {
                 if (newState == "FINISHED") {
                     await workerHolder.finish()
                 }
             })
-    
+
             if (job.account && job.video_info.isLive) {
                 if (job.account.like) {
                     await googleContext.like()
                 }
-    
+
                 if (job.account.dislike) {
                     await googleContext.dislike()
                 }
-    
+
                 if (job.account.comment) {
                     await googleContext.comment(job.account.comment)
                 }

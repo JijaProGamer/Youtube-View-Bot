@@ -1,5 +1,6 @@
 import path from 'path';
 import { readdirSync, statSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { to } from 'await-to-js';
 import { v4 } from 'uuid';
 
@@ -9,15 +10,17 @@ import "./server/init_server.js";
 let proxyFormats = ["socks5", "socks4", "http", "https"]
 global.routes = {}
 
-for (let folder of readdirSync(path.join(__dirname, "/api_routes"))) {
-    let stat = statSync(path.join(__dirname, "/api_routes", folder))
+let dirname = path.dirname(fileURLToPath(import.meta.url));
+
+for (let folder of readdirSync(path.join(dirname, "/server/api_routes"))) {
+    let stat = statSync(path.join(dirname, "/server/api_routes", folder))
 
     if (stat && stat.isDirectory()) {
         if (!routes[folder]) routes[folder] = []
 
-        for (let route of readdirSync(path.join(__dirname, "/api_routes", folder))) {
+        for (let route of readdirSync(path.join(dirname, "/server/api_routes", folder))) {
             let routeName = route.split(".")[0]
-            routes[folder][routeName] = require(path.join(__dirname, "/api_routes", folder, route))
+            routes[folder][routeName] = require(path.join(dirname, "/server/api_routes", folder, route))
         }
     }
 }
@@ -217,6 +220,7 @@ async function startWorking() {
                         io.emit("update_workers", workers)
 
                         let [err, result] = await to(startWorker(currentJob, worker, userDataDir))
+                        //if(err){
                         if (err && !err.includes("closed") && !err.includes("disconnected") && !err.includes("Protocol")) {
                             console.log(err)
                         }

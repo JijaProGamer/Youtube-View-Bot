@@ -1,17 +1,50 @@
 {
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "authors": "Bloxxy",
+        "description": "Youtube-View-Bot",
+        "targets": [
+          "win32",
+          "linux"
+        ]
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {
+            "authors": "Bloxxy",
+            "description": "Youtube-View-Bot",
+            "name": "Youtube-View-Bot",
+            "category": "Utility"
+          }
+        }
+      ]
+    }
+  },
   "name": "youtube-view-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Youtube-View-Bot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-forge": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JijaProGamer/Youtube-View-Bot.git"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Bloxxy",
+    "email": "bloxxy213gmg@gmail.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/JijaProGamer/Youtube-View-Bot/issues"
@@ -19,7 +52,14 @@
   "homepage": "https://github.com/JijaProGamer/Youtube-View-Bot#readme",
   "devDependencies": {
     "@bulatdashiev/svelte-slider": "^1.0.3",
+    "@electron-forge/cli": "^6.4.2",
+    "@electron-forge/maker-deb": "^6.4.2",
+    "@electron-forge/maker-rpm": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
+    "@electron-forge/maker-zip": "^6.4.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
     "@sveltejs/kit": "^1.0.0",
+    "electron": "27.0.2",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",
@@ -33,10 +73,14 @@
   "dependencies": {
     "@sveltejs/adapter-node": "^1.1.4",
     "@sveltejs/adapter-static": "^1.0.5",
+    "ansicolor": "^1.1.100",
     "await-to-js": "^3.0.0",
     "axios": "^1.2.3",
-    "better-sqlite3": "^8.0.1",
+    "better-sqlite3": "^9.0.0",
     "better-sqlite3-session-store": "^0.1.0",
+    "chalk": "^4.0.0",
+    "electron-prebuilt-compile": "^8.2.0",
+    "electron-squirrel-startup": "^1.0.0",
     "express": "^4.18.2",
     "express-bearer-token": "^2.4.0",
     "express-session": "^1.17.3",
@@ -44,8 +88,7 @@
     "find-chrome-bin": "^1.0.2",
     "helmet": "^6.0.1",
     "papaparse": "^5.4.1",
-    "puppeteer": "^19.6.0",
-    "puppeteer-extra-plugin-fingerprinter": "^1.1.8",
+    "proxy-agent-v2": "^1.0.3",
     "sass": "^1.57.1",
     "socket.io": "^4.5.4",
     "socket.io-client": "^4.5.4",
@@ -57,7 +100,7 @@
     "uuid": "^9.0.0",
     "vm2": "^3.9.14",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz",
-    "youtube-selfbot-api": "^3.5.3",
+    "youtube-selfbot-api": "^4.1.0",
     "ytdl-core": "^4.11.5"
   }
 }

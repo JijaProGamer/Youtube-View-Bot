@@ -177,8 +177,8 @@
 				<div class="same_line premium_line">
 					<p>
 						To get access to the full list of features, make an account on <a
-							href="https://www.bloxxy.net/">our website</a
-						>, log in with your patreon and make a 10$ subsription on our
+							href="https://www.bloxxy.net/account">our website</a
+						>, log in with your patreon and make a 10$ subscription on our
 						<a href="https://www.patreon.com/Bloxxy213/membership">patreon</a>.
 					</p>
 				</div>

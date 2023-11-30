@@ -5,6 +5,12 @@
 
 # 🚀 YouTube Watch Bot 🎥
 
+## Comprehensive Tutorial and Extensive Documentation 📚
+
+For detailed instructions on harnessing the full potential of the YouTube Watch Bot and exploring its myriad features, we provide a comprehensive documentation page:
+
+🔗 [Explore the Documentation](https://www.bloxxy.net/projects/1) 🔗
+
 ## Introduction
 
 Welcome to the incredible world of YouTube Watch Bot! Our state-of-the-art NodeJS program is specifically engineered to propel your YouTube presence to unprecedented heights. By leveraging the power of our bot, you can effortlessly skyrocket your views, watch time, comments, and likes. Whether you're a content creator looking to boost your channel's performance or a marketer aiming to enhance the exposure of your videos, the YouTube Watch Bot is your ultimate all-in-one solution. Prepare to unlock the true potential of your YouTube journey as we guide you through this comprehensive README file.
@@ -30,19 +36,12 @@ We are fully committed to continuously improving the YouTube Watch Bot and inves
 🌟 [Support us on Patreon](https://www.patreon.com/Bloxxy213/membership) 🌟
 🌟 [Support us on PayPal](https://www.paypal.me/bloxxywashere) 🌟
 
-## Comprehensive Tutorial and Extensive Documentation 📚
-
-For detailed instructions on harnessing the full potential of the YouTube Watch Bot and exploring its myriad features, we provide a comprehensive documentation page. Dive into the world of possibilities and discover how you can optimize your YouTube experience:
-
-🔗 [Explore the Documentation](https://www.bloxxy.net/projects/1) 🔗
-
 ## Requirements 📋
 
 To harness the full power of the YouTube Watch Bot, ensure that your system meets the following requirements:
 
-- NodeJS 16.17.1 and above
+- NodeJS S 18.16.10 and above
 - A connection speed of at least 2 megabits per minute per worker
-- Google Chrome 107.0.5304.107 or later (Please note that only Chrome is supported)
 - Adequate proxies to enhance your view count (if desired)
 - A decent computer with reliable hardware to handle the workload
 
@@ -59,7 +58,6 @@ The YouTube Watch Bot comes equipped with an impressive array of features design
 - 🌐 Bandwidth Optimization: Our program is optimized to utilize minimal bandwidth, consuming less than 1 megabit per minute per worker.
 - ⌛ Tailored Watch Time: Customize the desired watch time for each video, and enjoy the ability to leave likes and comments while logged in.
 - 🌐 Proxy Support: Seamlessly integrate with HTTP, HTTPS, SOCKS4, SOCKS5, and authentication-supported proxies to ensure smooth operation.
-- 🔄 Rotating Proxies: Opt for rotating proxies or choose to operate without proxies altogether, depending on your preferences.
 - 🎥 Versatile Video Support: Enjoy comprehensive support for livestreams, regular videos, and shorts.
 
 ## Topics 📖
@@ -78,10 +76,6 @@ In search of reliable proxies? Consider using IPRoyal, a trusted proxy provider.
 ## Contact Information 📞
 
 Before reaching out to our team, we kindly request that you thoroughly review our Wiki for assistance. However, if you still require support or have any inquiries, you can contact us via Discord:
-
-Discord Username: Bloxxy213#8826
-
-For faster response and real-time assistance, we encourage you to join our Discord server:
 
 🔗 [Join our Discord Server](https://discord.gg/E7Kb2c9euw) 🔗
 

@@ -8,7 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 } from 'uuid';
 import { NodeVM } from 'vm2';
-import { existsSync, readFileSync, readdirSync } from "fs"
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs"
 
 import { createRequire } from "module";
 import { defaultServerInfo } from "./vars.js"
@@ -45,11 +45,68 @@ function computeTime(time) {
     return new Date(time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), 0, 0)
 }
 
+function computeStringDate() {
+    let time = new Date();
+
+    return `${time.getDate()}-${time.getMonth()}-${time.getFullYear()}`
+}
+
+function computeAccureteTime() {
+    let time = new Date();
+
+    return `${time.getDate()}-${time.getMonth()}-${time.getFullYear()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}.${time.getMilliseconds()}`
+}
+
 function getCurrentTime() {
     return computeTime(new Date())
 }
 
-//db.pragma('journal_mode = WAL');
+let currentLogs = {}
+
+function ReadLatestLog(date, filePath) {
+    if (existsSync(filePath)) {
+        let fileData = readFileSync(filePath, "utf-8").split("\n").map((log) => {
+            const [_, currentTime, type, message] = log.match(/\[(\d+-\d+-\d+ \d+:\d+:\d+\.\d+)\] - \[(\w+)\]: (.+)/);
+            return { currentTime, type: type.toLowerCase(), message };
+        })
+
+        currentLogs[date] = fileData
+    } else {
+        currentLogs[date] = []
+    }
+}
+
+async function MakeLog(type, message) {
+    let date = computeStringDate()
+    let filePath = path.join(__dirname, "../../logs", `${date}.log`)
+    let currentTime = computeAccureteTime()
+    if (!currentLogs[date]) {
+        ReadLatestLog(date, filePath)
+    }
+
+    currentLogs[date].push({ type, message, currentTime })
+
+    writeFileSync(filePath, currentLogs[date].map((log) => {
+        return `[${log.currentTime}] - [${log.type.toUpperCase()}]: ${log.message}`
+    }).join("\n"))
+}
+
+async function MessageUser(MessageData){
+    io.emit("showMessage", {
+        title: MessageData.title,
+        text: MessageData.text,
+
+        button1text: MessageData.button1text || "Cancel",
+        button2text: MessageData.button2text || "OK",
+
+        secondButton: MessageData.secondButton || false,
+    })
+
+    await decisionTaken;
+}
+
+
+db.pragma('journal_mode = WAL');
 
 db.prepare("CREATE TABLE IF NOT EXISTS bandwidth (date INTEGER, value INTEGER, UNIQUE(date))").run()
 db.prepare("CREATE TABLE IF NOT EXISTS views (date INTEGER, value INTEGER, UNIQUE(date))").run()
@@ -66,8 +123,6 @@ db.prepare("CREATE TABLE IF NOT EXISTS proxies (data TEXT, id INTEGER, UNIQUE(id
 
 db.prepare("CREATE TABLE IF NOT EXISTS srv_password (password TEXT, id INTEGER)").run()
 db.prepare("CREATE TABLE IF NOT EXISTS keys (key TEXT, status INTEGER, UNIQUE(key))").run()
-
-
 
 db.prepare('INSERT OR IGNORE INTO proxies (data, id) VALUES (?, 1)').run(`["direct://"]`)
 db.prepare('INSERT OR IGNORE INTO good_proxies (data, id) VALUES (?, 1)').run(`[]`)
@@ -98,7 +153,7 @@ let settings = db.prepare(`SELECT * FROM options`).pluck().get()
 
 if (!settings) {
     settings = defaultServerInfo
-    
+
     db.prepare('INSERT INTO options (data, id) VALUES (?, 1)').run(JSON.stringify(settings))
     server.listen(settings.server_port, () => process.stdout.write(`listening|${settings.server_port}`))
 } else {
@@ -138,7 +193,8 @@ let makeGlobal = {
     lastHealth: {},
     random,
     computeTime, getCurrentTime,
-    sessionMiddleware,
+    sessionMiddleware, 
+    MakeLog, MessageUser
 }
 
 for (let [key, value] of Object.entries(makeGlobal)) {
@@ -170,3 +226,38 @@ for (let extensionPath of readdirSync(path.join(__dirname, "../../extensions")))
 }
 
 global.extensions = extensions
+
+process.on('unhandledRejection', (reason, promise) => {
+    MakeLog("error", reason.toString() + reason.stack || "")
+    console.error(reason, promise)
+    //process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+    MakeLog("error", error.toString() + error.stack || "")
+    console.error(error)
+    //process.exit(1);
+});
+
+process.on('warning', (warning) => {
+    MakeLog("warn", warning.toString())
+});
+
+const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+
+console.log = (...args) => {
+    MakeLog("info", args.join(" "))
+    originalConsoleLog(...args);
+};
+
+console.error = (...args) => {
+    MakeLog("error", args.join(" "))
+    originalConsoleError(...args);
+};
+
+console.warn = (...args) => {
+    MakeLog("warn", args.join(" "))
+    originalConsoleWarn(...args);
+};

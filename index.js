@@ -1,6 +1,7 @@
 const { app, BrowserWindow, shell } = require('electron')
 const { spawn } = require("child_process")
 const path = require("path")
+require("ansicolor").nice
 
 function runServer() {
     return new Promise((resolve, reject) => {
@@ -16,19 +17,24 @@ function runServer() {
                 resolved = true
                 resolve({ server: child, port })
             } else {
-                console.log(data)
-
                 if (!resolved) {
                     resolved = true
                     reject(data)
+                } else {
+                    console.log(`INFO: `.blue + data.trim())
                 }
             }
         })
 
         child.stderr.on("data", (data) => {
             data = data.toString()
-            console.log(data)
+
+            console.log(`ERROR: `.red + data)
         })
+
+        child.on('close', (code, signal) => {
+            process.exit(0)
+        });
     })
 }
 
@@ -47,7 +53,7 @@ runServer().then((srv_data) => {
         })
 
         win.webContents.on('will-navigate', function (e, url) {
-            if (url.includes("patreon") || url.includes("github") || url.includes("paypal") || url.includes("bloxxy.net")) {
+            if (url.includes("patreon") || url.includes("github") || url.includes("paypal") || url.includes("bloxxy.net") || url.includes("iproyal.com")) {
                 e.preventDefault();
                 shell.openExternal(url);
             }

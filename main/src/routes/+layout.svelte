@@ -4,6 +4,33 @@
 	import { fade } from 'svelte/transition';
 	import axios from 'axios';
 
+
+	import Message from './Message.svelte';
+	let showMessage = false;
+	let secondButton = false;
+	let messageTitle = ''
+  	let messageText = '';
+	let messageButton1Text = '';
+	let messageButton2Text = ''
+
+	let messageOnDecision = (decisionIndex: number) => {
+		socket.emit("decisionTaken", decisionIndex)
+	}
+
+	let onClose = () => {
+		showMessage = false;
+	}
+
+	socket.on('showMessage', (messageData) => {
+		showMessage = true;
+
+		messageTitle = messageData.title;
+		messageText = messageData.text;
+		messageButton1Text = messageData.button1text;
+		messageButton2Text = messageData.button2text;
+		secondButton = messageData.secondButton;
+	});
+
 	/*let cpu_load = '0';
 	let memory_usage = '0';
 	let temp = '0';
@@ -13,7 +40,7 @@
 	let temp_color = 'gray';
 	let connected_color = 'gray';*/
 
-	let showNavbar = true;
+	let showNavbar = false;
 
 	/*function changeHealth(health: any) {
 		if (!health || !health.load) return;
@@ -101,13 +128,25 @@
 			});
 	}*/
 
+	if (no_navbar !== 'true' && pLocation !== 'login') {
+		axios
+			.get('/api/health?login=true')
+			.then((data) => {
+				showNavbar = data.data.connected;
+			})
+	}
+
 	let el = document.querySelector('#slot');
-	let scrollpos_str = localStorage.getItem(`scrollpos-${window.location.href.split("://")[1]}`);
+	let scrollpos_str = localStorage.getItem(`scrollpos-${window.location.href.split('://')[1]}`);
 	let scrollpos = scrollpos_str ? parseInt(scrollpos_str) : 0;
 	el?.scrollTo(0, scrollpos);
 
 	window.onbeforeunload = function () {
-		if(el) localStorage.setItem(`scrollpos-${window.location.href.split("://")[1]}`, el.scrollTop.toString());
+		if (el)
+			localStorage.setItem(
+				`scrollpos-${window.location.href.split('://')[1]}`,
+				el.scrollTop.toString()
+			);
 	};
 
 	let actualNavbar = window.innerHeight < window.innerWidth;
@@ -160,9 +199,48 @@
 			axios.post('/api/workingStatus', { status: workersStatus });
 		}
 	}
+
+	const originalConsoleLog = console.log;
+	const originalConsoleError = console.error;
+	const originalConsoleWarn = console.warn;
+
+	console.log = (...args) => {
+		socket.emit('log_message', { type: 'info', message: args.join(' ') });
+		originalConsoleLog(...args);
+	};
+
+	console.error = (...args) => {
+		socket.emit('log_message', { type: 'error', message: args.join(' ') });
+		originalConsoleError(...args);
+	};
+
+	console.warn = (...args) => {
+		socket.emit('log_message', { type: 'warn', message: args.join(' ') });
+		originalConsoleWarn(...args);
+	};
+
+	window.onerror = function (message, source, lineno, colno, error) {
+		let msg = `${message}, ${source}, ${lineno}, ${colno}`;
+		socket.emit('log_message', { type: 'error', message: msg });
+
+		return false;
+	};
+
+	window.addEventListener('unhandledrejection', function (event) {
+		socket.emit('log_message', { type: 'error', message: `Promise unhandled rejection: ${event.reason}` });
+	});
 </script>
 
-<div id="warning" />
+<Message
+  text={messageText}
+  button1Text={messageButton1Text}
+  button2Text={messageButton2Text}
+  title={messageTitle}
+  showMessage={showMessage}
+  secondButton={secondButton}
+  onDecision={messageOnDecision}
+  onClose={onClose}
+/>
 
 <div id="main_div">
 	{#if showNavbar}
@@ -245,6 +323,11 @@
 					<a class="sidebar_button blue_sidebar" href="/donate">
 						<img src="/svgs/donate.svg" alt="button svg" class="sidebar_image" />
 						<span class="sidebar_btn_title">Donate</span>
+					</a>
+
+					<a class="sidebar_button blue_sidebar" href="https://github.com/JijaProGamer/Youtube-View-Bot">
+						<img src="/svgs/github.svg" alt="button svg" class="sidebar_image" />
+						<span class="sidebar_btn_title">Github page</span>
 					</a>
 				</div>
 			</div>

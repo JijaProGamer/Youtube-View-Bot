@@ -11,3 +11,5 @@ vite.config.ts.timestamp-*
 database.db3*
 cache
 /dev
+*.log
+out/

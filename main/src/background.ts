@@ -24,7 +24,7 @@ let opts: Options = {
 };
 
 let lastData: Options = deepCopy(opts);
-let dataChangeFunc = (opts: any) => {}
+let dataChangeFunc = (opts: any) => { }
 let newData = (data: any) => {
     opts = data
 }
@@ -35,14 +35,14 @@ function deepCopy(obj: any): any {
     return JSON.parse(JSON.stringify(obj))
 }
 
-function deepEqual(x: any, y: any): boolean {
-    const ok = Object.keys, tx = typeof x, ty = typeof y;
-    return x && y && tx === 'object' && tx === ty ? (
-      ok(x).length === ok(y).length &&
-        ok(x).every(key => deepEqual(x[key], y[key]))
-    ) : (x === y);
-  }
-  
+function deepEqual(a: any, b: any): boolean {
+    if (a && b && typeof a == 'object' && typeof b == 'object') {
+        if (Object.keys(a).length != Object.keys(b).length) return false;
+        for (var key in a) if (!deepEqual(a[key], b[key])) return false;
+        return true;
+    } else return a === b
+}
+
 
 function publishData() {
     axios.post("/api/settings", opts)

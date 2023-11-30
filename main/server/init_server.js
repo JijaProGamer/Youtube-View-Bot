@@ -90,12 +90,14 @@ function verifyLoginStatus(req, res, next) {
         next()
     } else {
         if (server_password_global.length > 0) {
-            if (lastRoute && lastRoute == "api") {
+            if (lastRoute == "api") {
                 return res.sendStatus(403)
             }
 
             res.redirect(`/login`)
         } else {
+            req.session.loggedIn = true
+
             next()
         }
     }

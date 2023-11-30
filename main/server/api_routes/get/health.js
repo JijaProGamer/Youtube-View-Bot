@@ -4,7 +4,7 @@ async function getHealth(minimal, multiple) {
     let main = {}
     let nodes = []
 
-    if (minimal) {        
+    if (minimal) {
         let [memory, cpu, load, temperature] = await Promise.all([
             systeminformation.mem(),
             systeminformation.cpu(),
@@ -41,6 +41,33 @@ async function getHealth(minimal, multiple) {
     return lastHealth
 }
 
+async function getCPUHealth() {
+    let main = {}
+    let nodes = []
+
+    let [memory, load] = await Promise.all([
+        systeminformation.mem(),
+        systeminformation.currentLoad(),
+    ])
+
+    main = { load, memory }
+
+    global.lastHealth = { main, nodes }
+
+    io.emit("health", lastHealth)
+    return lastHealth
+}
+
+function repeat() {
+    getCPUHealth().then(() => {
+        setTimeout(() => {
+            repeat()
+        }, 5000)
+    })
+}
+
+repeat()
+
 /*function repeat() {
     getHealth(true, true).then(() => {
         setTimeout(() => {
@@ -54,6 +81,11 @@ repeat()*/
 module.exports = (req, res) => {
     let minimal = req.query.minimal == "true"
     let multiple = req.query.multiple == "true"
+    let login = req.query.login == "true"
+
+    if(login){
+        return res.json({ connected: true });
+    }
 
     if (minimal && !multiple) {
         res.json(lastHealth)
