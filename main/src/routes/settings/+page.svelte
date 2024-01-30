@@ -1,12 +1,16 @@
 <script lang="ts">
+	import axios from 'axios';
 	import Slider from '@bulatdashiev/svelte-slider';
 	import { opts, dataChanged, newData } from '../../background.js';
+
 	let data = opts;
 	dataChanged((newData: any) => (data = newData));
 	$: newData(data);
 
 	$: changePort(data.server_port);
 	$: changeAPIKey(data.api_key);
+
+	let isLoggedIn = false;
 
 	function changePort(newPort: number) {
 		if (newPort < 1024) {
@@ -18,9 +22,20 @@
 		}
 	}
 
+	async function checkLoginStatus(){
+		let logedInData = (await axios.get(`/api/patreon_status`)).data
+		isLoggedIn = logedInData.status;
+	}
+
 	function changeAPIKey(newAPIKey: string) {
 		data.api_key = newAPIKey;
+		checkLoginStatus();
 	}
+
+	checkLoginStatus();
+	setInterval(() => {
+		checkLoginStatus();
+	}, 1000 * 15)
 </script>
 
 <div id="form_container">
@@ -43,7 +58,7 @@
 				<p class="setting_info">What port should this server use? (Restart to apply)</p>
 			</div>
 
-			<div class="setting_div">
+			<!--<div class="setting_div">
 				<div class="same_line">
 					<h2 class="setting_name">Close server on finish:</h2>
 
@@ -57,16 +72,6 @@
 				<p class="setting_info">
 					Should the application close by itself after it finishes working?
 				</p>
-			</div>
-
-			<!--<div class="setting_div">
-				<div class="same_line">
-					<h2 class="setting_name">Chrome path:</h2>
-
-					<input class="setting_text" type="text" bind:value={data.chromePath} />
-				</div>
-
-				<p class="setting_info">Path to a chrome/chromium executable</p>
 			</div>-->
 
 			<div class="setting_div">
@@ -101,6 +106,20 @@
 				</div>
 
 				<p class="setting_info">Should it stop spawning workers when RAM/CPU is at 95%?</p>
+			</div>
+
+			<div class="setting_div">
+				<div class="same_line">
+					<h2 class="setting_name">Send reminders:</h2>
+
+					<input
+						class="setting_button setting_checkbox"
+						type="checkbox"
+						bind:checked={data.send_reminders}
+					/>
+				</div>
+
+				<p class="setting_info">Should it give occasional reminders?</p>
 			</div>
 		</div>
 
@@ -185,11 +204,27 @@
 
 				<div class="same_line premium_line">
 					<p>
+						NOTE: Each subscription lasts one month.
+					</p>
+				</div>
+
+				<div class="same_line premium_line">
+					<p>
 						After making a account and logging in with your patreon, copy your API Key and paste it
 						here:
 					</p>
 
-					<input type="text" class="premium_textbox" bind:value={data.api_key}/>
+					<input type="text" class="premium_textbox" bind:value={data.api_key} style="margin-bottom: 1em;"/>
+				</div>
+
+				<div class="same_line premium_line">
+					<p class="premium_status">
+						Premium status:  
+					</p>
+
+					<p style="margin-left: 0.5em" class="premium_status premium_status_{isLoggedIn ? "premium" : "normal"}">
+						{isLoggedIn ? "PREMIUM" : "NON-PATREON"}
+					</p>
 				</div>
 			</div>
 		</div>
@@ -216,10 +251,23 @@
 		margin-left: 1%;
 	}
 
+	.premium_status {
+		font-size: 1.5em;
+	}
+
+	.premium_status_normal {
+		color: #ff0000;
+	}
+
+	.premium_status_premium {
+		color: #05f305;
+	}
+
 	.premium_line {
 		color: rgb(207, 211, 216);
 		font-size: 1em;
 
+		text-align: center;
 		display: flex;
 		align-items: center;
 		flex-direction: row;

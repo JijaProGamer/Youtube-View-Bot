@@ -11,6 +11,7 @@ export let neededRanks = {
     video_info: 1,
     view_workers_stats: 1,
     view_extensions: 1,
+    patreon_status: 1,
 
     videos: 2,
     proxies: 2,
@@ -30,6 +31,7 @@ export let defaultServerInfo = {
     concurrency: 3,
     concurrencyInterval: 20,
     stop_spawning_on_overload: true,
+    send_reminders: true,
 
     headless: false,
     auto_skip_ads: true,

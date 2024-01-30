@@ -6,6 +6,7 @@
 
 
 	import Message from './Message.svelte';
+	import ReminderMessage from './ReminderMessage.svelte';
 	let showMessage = false;
 	let secondButton = false;
 	let messageTitle = ''
@@ -13,12 +14,21 @@
 	let messageButton1Text = '';
 	let messageButton2Text = ''
 
+	let showReminderMessage = false;
+	let reminderMessageTitle = ''
+  	let reminderMessageText = '';
+	let reminderImage = '';
+	let reminderMessageButton1Text = '';
+	let reminderMessageButton2Text = ''
+	let reminderMessageButton3Text = ''
+
 	let messageOnDecision = (decisionIndex: number) => {
 		socket.emit("decisionTaken", decisionIndex)
 	}
 
 	let onClose = () => {
 		showMessage = false;
+		showReminderMessage = false;
 	}
 
 	socket.on('showMessage', (messageData) => {
@@ -29,6 +39,17 @@
 		messageButton1Text = messageData.button1text;
 		messageButton2Text = messageData.button2text;
 		secondButton = messageData.secondButton;
+	});
+
+	socket.on('showReminderMessage', (messageData) => {
+		showReminderMessage = true;
+
+		reminderMessageTitle = messageData.title;
+		reminderMessageText = messageData.text;
+		reminderImage = messageData.image;
+		reminderMessageButton1Text = messageData.button1text;
+		reminderMessageButton2Text = messageData.button2text;
+		reminderMessageButton3Text = messageData.button3text;
 	});
 
 	/*let cpu_load = '0';
@@ -231,6 +252,18 @@
 	});
 </script>
 
+<ReminderMessage
+  text={reminderMessageText}
+  button1Text={reminderMessageButton1Text}
+  button2Text={reminderMessageButton2Text}
+  button3Text={reminderMessageButton3Text}
+  title={reminderMessageTitle}
+  showMessage={showReminderMessage}
+  image={reminderImage}
+  onDecision={messageOnDecision}
+  onClose={onClose}
+/>
+
 <Message
   text={messageText}
   button1Text={messageButton1Text}
@@ -320,7 +353,7 @@
 						<span class="sidebar_btn_title">Change password</span>
 					</a>
 
-					<a class="sidebar_button blue_sidebar" href="/donate">
+					<a class="sidebar_button blue_sidebar" href="https://bloxxy.net/donate">
 						<img src="/svgs/donate.svg" alt="button svg" class="sidebar_image" />
 						<span class="sidebar_btn_title">Donate</span>
 					</a>

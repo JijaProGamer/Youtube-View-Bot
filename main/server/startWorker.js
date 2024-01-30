@@ -3,7 +3,6 @@ import { default as youtube_selfbot_api } from "youtube-selfbot-api"
 import { to } from "await-to-js"
 import * as path from "path"
 import { v4 } from "uuid"
-import { writeFileSync } from "fs"
 
 let db_insert_watch_time = db.prepare(`INSERT OR IGNORE INTO watch_time (date, value) VALUES (?, ?)`)
 let db_update_watch_time = db.prepare(`UPDATE watch_time SET value = value + ? WHERE date = ?`)
@@ -189,7 +188,7 @@ function startWorker(job, worker, userDataDir) {
             let [google_setup_err, googleContext] = await to(page.setupGoogle(job.account, cookies))
             if (google_setup_err) return processErr(`Error creating google context: ${google_setup_err}`)
 
-            let [google_login_err] = await to(googleContext.login(job.account))
+            let [google_login_err] = await to(googleContext.login(job.account, cookies))
             if (google_login_err) return processErr(`Error logging into google: ${google_login_err}`)
         } else {
             let [clear_storage_err] = await to(browser.clearStorage())
@@ -205,8 +204,8 @@ function startWorker(job, worker, userDataDir) {
         if (goto_video_err) return processErr(`Error going to the video: ${goto_video_err}`)
 
         if (!job.video_info.isLive) {
-            let [week_err] = await to(watcherContext.seek(0))
-            if (week_err) return processErr(`Error seeking to the start of the video: ${week_err}`)
+            let [seek_err] = await to(watcherContext.seek(0))
+            if (seek_err) return processErr(`Error seeking to the start of the video: ${seek_err}`)
         }
 
         let workerHolder = {
@@ -256,15 +255,19 @@ function startWorker(job, worker, userDataDir) {
 
             if (job.account && job.video_info.isLive) {
                 if (job.account.like) {
-                    await googleContext.like()
+                    await watcherContext.like()
                 }
 
                 if (job.account.dislike) {
-                    await googleContext.dislike()
+                    await watcherContext.dislike()
+                }
+
+                if (job.account.subscribe) {
+                    await watcherContext.subscribe()
                 }
 
                 if (job.account.comment) {
-                    await googleContext.comment(job.account.comment)
+                    await watcherContext.comment(job.account.comment)
                 }
             }
         }

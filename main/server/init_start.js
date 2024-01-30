@@ -21,6 +21,7 @@ const require = createRequire(import.meta.url);
 
 const SqliteStore = SQLite3Session(session)
 const db = new Database(path.join(__dirname, `../database.db3`))
+
 const app = express();
 let route = express.Router()
 
@@ -63,21 +64,21 @@ function getCurrentTime() {
 
 let currentLogs = {}
 
-if(!existsSync(path.join(__dirname, "../../logs"))){
+if (!existsSync(path.join(__dirname, "../../logs"))) {
     mkdirSync(path.join(__dirname, "../../logs"))
 }
 
 function ReadLatestLog(date, filePath) {
-    if (existsSync(filePath)) {
-        let fileData = readFileSync(filePath, "utf-8").split("\n").map((log) => {
+    let fileData = []
+
+    try {
+        fileData = readFileSync(filePath, "utf-8").split("\n").map((log) => {
             const [_, currentTime, type, message] = log.match(/\[(\d+-\d+-\d+ \d+:\d+:\d+\.\d+)\] - \[(\w+)\]: (.+)/);
             return { currentTime, type: type.toLowerCase(), message };
         })
+    } catch (err) { }
 
-        currentLogs[date] = fileData
-    } else {
-        currentLogs[date] = []
-    }
+    currentLogs[date] = fileData
 }
 
 async function MakeLog(type, message) {
@@ -95,7 +96,7 @@ async function MakeLog(type, message) {
     }).join("\n"))
 }
 
-async function MessageUser(MessageData){
+async function MessageUser(MessageData) {
     io.emit("showMessage", {
         title: MessageData.title,
         text: MessageData.text,
@@ -106,9 +107,61 @@ async function MessageUser(MessageData){
         secondButton: MessageData.secondButton || false,
     })
 
-    await decisionTaken;
+    return await decisionTaken;
 }
 
+async function RemindUser(MessageData) {
+    io.emit("showReminderMessage", {
+        title: MessageData.title,
+        text: MessageData.text,
+
+        button1text: MessageData.button1text || "Remind me later",
+        button2text: MessageData.button2text || "Stop reminding me",
+        button3text: MessageData.button3text || "Take me there",
+
+        image: MessageData.image,
+    })
+
+    let decisionResponse = await decisionTaken;
+
+    switch(decisionResponse){
+        case 1:
+            break;
+        case 2:
+            settings.send_reminders = false;
+
+            db.prepare('UPDATE options SET data = ? WHERE id = 1').run(JSON.stringify(settings))        
+            io.emit("settings", settings)
+            break;
+        case 3:
+            process.stdout.write(`navigate|${MessageData.url}\n`);
+            break;
+    }
+}
+
+setInterval(() => {
+    if(settings.send_reminders){
+        let random = Math.floor(Math.random() * 2)
+
+        if(random == 0 || global.premium){
+            RemindUser({
+                title: "Rate your experience",
+                text: `If you like the Youtube-View-Bot project, consider giving it a star, read and fork on github to help me \nmake updates and improvements faster and better.`,
+            
+                image: "/images/github-mark-white.png",
+                url: "https://github.com/JijaProGamer/Youtube-View-Bot"
+            }) 
+        } else if(random == 1) {
+            RemindUser({
+                title: "Get premium access",
+                text: `For unrestricted access to all the features of the Youtube-View-Bot, consider subscribing to our patreon, \nby following the instructions on the settings page.`,
+            
+                image: "/images/PATREON_SYMBOL_1_WHITE_RGB.png",
+                url: "/settings"
+            })
+        }
+    }
+}, 1000 * 60 * 30)
 
 db.pragma('journal_mode = WAL');
 
@@ -197,7 +250,7 @@ let makeGlobal = {
     lastHealth: {},
     random,
     computeTime, getCurrentTime,
-    sessionMiddleware, 
+    sessionMiddleware,
     MakeLog, MessageUser
 }
 

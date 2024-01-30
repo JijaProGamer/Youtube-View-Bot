@@ -10,15 +10,18 @@ function clamp(num, min, max) {
 function calculateAction(work_video) {
     let likePercent = clamp(work_video.likePercent, 0, 100)
     let dislikePercent = clamp(work_video.likePercent, 0, 100)
+    let subscribePercent = clamp(work_video.subscribePercent, 0, 100)
+
     let percent1 = Math.random() * 100
     let percent2 = Math.random() * 100
+    let percent3 = Math.random() * 100
 
     if (percent1 < likePercent) {
-        return "like"
+        return ["like", percent3 < subscribePercent && "subscribe" || "none"]
     }
 
     if (percent2 < dislikePercent) {
-        return "dislike"
+        return ["dislike", percent3 < subscribePercent && "subscribe" || "none"]
     }
 }
 
@@ -66,8 +69,9 @@ function generateJob(work_video, work_proxies, video_id, videoInfo, work_account
 
         job.account = {
             ...work_account,
-            like: action == "like",
-            dislike: action == "dislike",
+            like: action[0] == "like",
+            dislike: action[0] == "dislike",
+            subscribe: action[1] == "subscribe",
             comment: comment,
             likeAt: random(work_video.likeAt[0], work_video.likeAt[1]),
             dislikeAt: random(work_video.dislikeAt[0], work_video.dislikeAt[1]),
@@ -76,6 +80,7 @@ function generateJob(work_video, work_proxies, video_id, videoInfo, work_account
 
         if(job.account.like && job.watch_time < (job.account.likeAt + 10)) {job.watch_time = job.account.likeAt + 10}
         if(job.account.dislike && job.watch_time < (job.account.dislikeAt + 10)) {job.watch_time = job.account.dislikeAt + 10}
+        if(job.account.subscribe && job.watch_time < (job.account.subscribeAt + 10)) {job.watch_time = job.account.subscribeAt + 10}
         if(job.account.comment && job.watch_time < (job.account.commentAt + 10)) {job.watch_time = job.account.commentAt + 10}
     }
 

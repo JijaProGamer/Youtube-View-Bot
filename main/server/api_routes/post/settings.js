@@ -28,6 +28,11 @@ updatePremiumRank()
 
 let lastKey = settings.api_key
 
+global.premiumOnlyTitle = "This feature requires you to be a patreon subscriber"
+global.premiumText = 
+`you must be a subscriber on our <a style="color: #3498db; text-decoration: none; cursor: pointer; background-color: none; font-size: 1em;" href="">Patreon</a>.
+After doing so, follow the "Full feature access" instructions in the settings tab.`
+
 module.exports = async (req, res) => {
     settings = req.body
     settings.api_key = settings.api_key.trim()
@@ -37,21 +42,33 @@ module.exports = async (req, res) => {
         updatePremiumRank()
     }
 
-    if(settings.concurrency > 3 && !global.premium){
-        await MessageUser({
-            title: "This feature requires you to be a patreon subscriber",
-            text: `To be able to have more than 3 concurrect workers,
-            you must be a subscriber on our <a style="color: #3498db; text-decoration: none; cursor: pointer; background-color: none; font-size: 1em;" href="">Patreon</a>.
-            After doing so, follow the "Full feature access" instructions in the settings tab.`,
-
-            button1text: "OK",
-
-            secondButton: false,
-        })
-
-        settings.concurrency = 3;
-    }
+    if(!global.premium){
+        if(settings.concurrency > 3){
+            await MessageUser({
+                title: premiumOnlyTitle,
+                text: `To be able to have more than 3 concurrect workers, \n${premiumText}`,
     
+                button1text: "OK",
+    
+                secondButton: false,
+            })
+    
+            settings.concurrency = 3;
+        } 
+
+        if(settings.auto_skip_ads == false){
+            await MessageUser({
+                title: premiumOnlyTitle,
+                text: `To be able to watch the ads, \n${premiumText}`,
+    
+                button1text: "OK",
+    
+                secondButton: false,
+            })
+    
+            settings.auto_skip_ads = true;
+        }
+    }
     db.prepare('UPDATE options SET data = ? WHERE id = 1').run(JSON.stringify(settings))
     res.sendStatus(201)
 

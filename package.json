@@ -26,15 +26,17 @@
       ]
     }
   },
+  "type": "commonjs",
   "name": "youtube-view-bot",
-  "version": "1.0.0",
+  "version": "3.0.2",
   "description": "Youtube-View-Bot",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start-forge": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "rebuild-sqlite": ".\\node_modules\\.bin\\electron-rebuild.cmd -f -w better-sqlite3"
   },
   "repository": {
     "type": "git",
@@ -76,7 +78,7 @@
     "ansicolor": "^1.1.100",
     "await-to-js": "^3.0.0",
     "axios": "^1.2.3",
-    "better-sqlite3": "^8.6.0",
+    "better-sqlite3": "^9.2.2",
     "better-sqlite3-session-store": "^0.1.0",
     "chalk": "^4.0.0",
     "electron-prebuilt-compile": "^1.8.4",
@@ -92,6 +94,7 @@
     "sass": "^1.57.1",
     "socket.io": "^4.5.4",
     "socket.io-client": "^4.5.4",
+    "sqlite3": "^5.1.6",
     "svelte-chartjs": "^3.1.2",
     "svelte-multiselect": "^8.3.0",
     "svelte-preprocess": "^5.0.1",
@@ -100,7 +103,7 @@
     "uuid": "^9.0.0",
     "vm2": "^3.9.14",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz",
-    "youtube-selfbot-api": "^4.1.1",
+    "youtube-selfbot-api": "^4.1.7",
     "ytdl-core": "^4.11.5"
   }
 }

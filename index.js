@@ -9,10 +9,10 @@ function runServer() {
         let child = spawn("node", [path.join(__dirname, "/main/server.js")])
         let resolved = false
 
-        child.stdout.on("data", (data) => {
+        child.stdout.once("data", (data) => {
             data = data.toString()
 
-            if (data.includes("listening")) {
+            if (data.startsWith("listening")) {
                 let port = data.split("|")[1]
 
                 resolved = true
@@ -36,42 +36,32 @@ function runServer() {
         child.on('close', (code, signal) => {
             process.exit(0)
         });
-
-        /*let child = spawn("node", [path.join(__dirname, "/main/server.js")])
-        let resolved = false
-
-        child.stdout.on("data", (data) => {
-            data = data.toString()
-
-            if (data.includes("listening")) {
-                let port = data.split("|")[1]
-
-                resolved = true
-                resolve({ server: child, port })
-            } else {
-                if (!resolved) {
-                    resolved = true
-                    reject(data)
-                } else {
-                    console.log(`INFO: `.blue + data.trim())
-                }
-            }
-        })
-
-        child.stderr.on("data", (data) => {
-            data = data.toString()
-
-            console.log(`ERROR: `.red + data)
-        })
-
-        child.on('close', (code, signal) => {
-            process.exit(0)
-        });*/
     })
 }
 
 runServer().then((srv_data) => {
     let { server, port } = srv_data
+
+    server.stdout.on("data", (data) => {
+        data = data.toString().split("\n")
+        let navigated = false;
+
+        for(let dataLine of data){
+            dataLine = dataLine.trim()
+            if(dataLine.length == 0) continue;
+
+            if (dataLine.startsWith("navigate|")) {
+                if(navigated) continue;
+
+                let url = dataLine.split("|")[1]
+    
+                shell.openExternal(url);
+                navigated = true;
+            } else {
+                console.log(`INFO: `.blue + dataLine.trim())
+            }
+        }
+    })
 
     const createWindow = () => {
         const win = new BrowserWindow({
