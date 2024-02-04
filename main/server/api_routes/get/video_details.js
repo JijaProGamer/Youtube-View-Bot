@@ -14,10 +14,7 @@ module.exports = (req, res) => {
 
         return res.send(csv_data)
     } else if (req.query.type == "comments") {
-        res.set("Content-Disposition", "attachment; filename=comments.json")
-        let csv_data = Papa.unparse(video.comments)
-
-        return res.send(csv_data)
+        return res.json(video.accounts)
     }
 
     res.send("")

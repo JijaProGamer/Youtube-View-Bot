@@ -3,6 +3,8 @@
     <img alt="OS" src="https://img.shields.io/badge/OS-Windows%20/%20Mac%20/%20Linux-success">
 </p>
 
+# THE ONLY WORKING FREE AND OPEN SOURCE VIEW BOT ON THE MARKET AS OF 2024
+
 # 🚀 YouTube Watch Bot 🎥
 
 ## Comprehensive Tutorial and Extensive Documentation 📚
@@ -10,6 +12,13 @@
 For detailed instructions on harnessing the full potential of the YouTube Watch Bot and exploring its myriad features, we provide a comprehensive documentation page:
 
 🔗 [Explore the Documentation](https://www.bloxxy.net/projects/1) 🔗
+
+## Supporting Development 💖
+
+We are fully committed to continuously improving the YouTube Watch Bot and investing substantial time and effort into its development. To support our endeavors and show your appreciation for our work, we graciously accept donations. If you value the YouTube Watch Bot and wish to contribute, please consider visiting our Patreon page and becoming a patron:
+
+🌟 [Support us on Patreon](https://www.patreon.com/Bloxxy213/membership) 🌟
+🌟 [Support us on PayPal](https://www.paypal.me/bloxxywashere) 🌟
 
 ## Introduction
 
@@ -28,13 +37,6 @@ We prioritize your satisfaction, and our user-friendly interface reflects our co
 3. Seamless YouTube Integration 🌐
 
 At YouTube Watch Bot, we strive to seamlessly integrate with the YouTube platform, optimizing your experience and boosting your performance. Our program is designed to seamlessly align with YouTube's features and functionalities, ensuring a smooth and harmonious workflow. From bypassing unnecessary pages to intelligently navigating YouTube's ecosystem, our bot seamlessly integrates into your YouTube strategy. With the YouTube Watch Bot as your ally, you can effortlessly leverage the platform's capabilities, enhance your metrics, and elevate your online presence. Embrace a hassle-free and streamlined YouTube journey with the YouTube Watch Bot.
-
-## Supporting Development 💖
-
-We are fully committed to continuously improving the YouTube Watch Bot and investing substantial time and effort into its development. To support our endeavors and show your appreciation for our work, we graciously accept donations. If you value the YouTube Watch Bot and wish to contribute, please consider visiting our Patreon page and becoming a patron:
-
-🌟 [Support us on Patreon](https://www.patreon.com/Bloxxy213/membership) 🌟
-🌟 [Support us on PayPal](https://www.paypal.me/bloxxywashere) 🌟
 
 ## Requirements 📋
 

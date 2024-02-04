@@ -28,7 +28,7 @@ module.exports = (req, res) => {
     if(typeof(id) !== 'string' || id.trim().length < 11) return res.sendStatus(404)
 
     if (cache[id]) return res.send(cache[id])
-    if (blacklist.includes(id)) return res.sendStatus(404)
+    //if (blacklist.includes(id)) return res.sendStatus(404)
 
     let videoFromDB = db_get_video.get(id)
     if(videoFromDB){

@@ -21,6 +21,36 @@ let workingList = []
 
 global.watchInterval = setInterval(() => {
     workingList.forEach(async (workingHolder, workingIndex) => {
+        let [ad_err, ad] = await to(workingHolder.watcherContext.isAdPlaying())
+        if (ad_err) return workingHolder.fail(`Error getting the current ad: ${ad_err}`)
+
+        if (ad.type == "small") {
+            var [ad_skip_err] = await to(workingHolder.watcherContext.skipAd(false))
+            if (ad_skip_err) return workingHolder.fail(`Error skipping the current ad: ${ad_err}`)
+        }
+
+        if (ad.type == "video") {
+            if (settings.watch_ads) {
+                if (!workingHolder.adDetected) {
+                    workingHolder.adDetected = true;
+                    workingHolder.adPlayTime = random(settings.skip_ads_after[0], settings.skip_ads_after[1]);
+                } else {
+                    let currentAdPercent = (100 / ad.duration) * ad.currentTime;
+
+                    if (currentAdPercent > workingHolder.adPlayTime && ad.canSkip) {
+                        var [ad_skip_err] = await to(workingHolder.watcherContext.skipAd(false))
+                        if (ad_skip_err) return workingHolder.fail(`Error skipping the current ad: ${ad_err}`)
+                    }
+
+                }
+            } else {
+                if (ad.canSkip) {
+                    var [ad_skip_err] = await to(workingHolder.watcherContext.skipAd(false))
+                    if (ad_skip_err) return workingHolder.fail(`Error skipping the current ad: ${ad_err}`)
+                }
+            }
+        }
+
         let [watchtime_err, currentWatchTime] = await to(workingHolder.watcherContext.time())
         if (watchtime_err) return workingHolder.fail(`Error getting the watchtime: ${watchtime_err}`)
 
@@ -217,6 +247,9 @@ function startWorker(job, worker, userDataDir) {
             maxWatchtime: ((job.video_info.isShort || job.isLivestream) && 1) || (clamp(wtfp, Math.min(job.video_info.duration, 30), 30)),
             start_time: Date.now(),
 
+            adDetected: false,
+            adPlayTime: 0,
+
             browser: browser,
             watcherContext,
             account: job.account,
@@ -261,7 +294,6 @@ function startWorker(job, worker, userDataDir) {
                 if (job.account.dislike) {
                     await watcherContext.dislike()
                 }
-
                 if (job.account.subscribe) {
                     await watcherContext.subscribe()
                 }

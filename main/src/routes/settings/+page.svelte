@@ -160,7 +160,7 @@
 					<div class="same_line">
 						<h2 class="setting_name">Skip ads after (percent):</h2>
 
-						<Slider max="100" min="15" bind:value={data.skip_ads_after} range order />
+						<Slider max="100" min="0" bind:value={data.skip_ads_after} range order />
 					</div>
 
 					<p class="setting_info">After what percent to skip ads?</p>

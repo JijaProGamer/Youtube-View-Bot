@@ -36,6 +36,9 @@ export let defaultServerInfo = {
     headless: false,
     auto_skip_ads: true,
 
+    max_seconds_ads: 30,
+    skip_ads_after: [25, 75],
+
     timeout: 60,
     disable_proxy_tests: false,
     proxy_tests_headless: false,

@@ -103,7 +103,7 @@
     "uuid": "^9.0.0",
     "vm2": "^3.9.14",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz",
-    "youtube-selfbot-api": "^4.1.7",
+    "youtube-selfbot-api": "^4.1.8",
     "ytdl-core": "^4.11.5"
   }
 }

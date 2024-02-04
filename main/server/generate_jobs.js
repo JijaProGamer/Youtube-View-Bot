@@ -23,6 +23,10 @@ function calculateAction(work_video) {
     if (percent2 < dislikePercent) {
         return ["dislike", percent3 < subscribePercent && "subscribe" || "none"]
     }
+
+    if (percent3 < subscribePercent) {
+        return "subscribe"
+    }
 }
 
 function generateJob(work_video, work_proxies, video_id, videoInfo, work_account) {
@@ -72,14 +76,19 @@ function generateJob(work_video, work_proxies, video_id, videoInfo, work_account
             like: action[0] == "like",
             dislike: action[0] == "dislike",
             subscribe: action[1] == "subscribe",
+            like: action == "like",
+            dislike: action == "dislike",
+            subscribe: action == "subscribe",
             comment: comment,
             likeAt: random(work_video.likeAt[0], work_video.likeAt[1]),
             dislikeAt: random(work_video.dislikeAt[0], work_video.dislikeAt[1]),
+            subscribeAt: random(work_video.subscribeAt[0], work_video.subscribeAt[1]),
             commentAt: random(work_video.commentAt[0], work_video.commentAt[1]),
         }
 
         if(job.account.like && job.watch_time < (job.account.likeAt + 10)) {job.watch_time = job.account.likeAt + 10}
         if(job.account.dislike && job.watch_time < (job.account.dislikeAt + 10)) {job.watch_time = job.account.dislikeAt + 10}
+        if(job.account.subscribe && job.watch_time < (job.account.subscribeAt + 10)) {job.watch_time = job.account.subscribeAt + 10}
         if(job.account.subscribe && job.watch_time < (job.account.subscribeAt + 10)) {job.watch_time = job.account.subscribeAt + 10}
         if(job.account.comment && job.watch_time < (job.account.commentAt + 10)) {job.watch_time = job.account.commentAt + 10}
     }
